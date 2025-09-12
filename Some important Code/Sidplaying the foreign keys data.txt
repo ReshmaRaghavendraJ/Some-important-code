@@ -1,0 +1,13 @@
+@PostMapping("/bookmedicines/{medicineid}/{shopid}")
+    public ResponseEntity<?> bookmedicines(@PathVariable Integer medicineid,@PathVariable Integer shopid,@RequestBody ShopOrder obj)
+    {
+        var medinfo=medicineRepo.findById(medicineid).orElseThrow(()->new RuntimeException("Medcine id not found"));
+        var shopinfo=shopRepo.findById(shopid).orElseThrow(()->new RuntimeException("Shop id not found"));
+        obj.setStatus("Booked");
+        obj.setShop6(shopinfo);
+        obj.setMedicine6(medinfo);
+        obj.setDistributor9(medinfo.getDistributor10());
+        obj.setOrderdate(LocalDateTime.now());
+        shopOrderRepo.save(obj);
+        return new ResponseEntity<>("Shop Booked medicine Successfully", HttpStatus.OK);
+    }

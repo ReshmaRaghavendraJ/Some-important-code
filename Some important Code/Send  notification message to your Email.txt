@@ -1,0 +1,132 @@
+//Add this dependency in pom.xml
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+------------------------------------------------------------------------------------------------
+//Create DTO folder->inside create class->Emaildata  (No Code Change)
+package com.example.login.DTO;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Emaildata
+{
+    private String recipient;
+    private String subject;
+    private  String message;
+
+}
+---------------------------------------------------------------------------------------------------
+//Create SmtpServices folder->inside create class->SmtpService   (No code Change)
+package com.example.login.SmtpServices;
+
+import com.example.login.DTO.Emaildata;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+
+@Service
+public class SmtpService {
+
+    @Autowired
+    private JavaMailSender javaMailSender;
+
+    @Value("${spring.mail.username}")
+    private String sender;
+
+    public String sendMail(Emaildata details) {
+        // Creating a MimeMessage object
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper;
+
+        try {
+            // Set up the helper for sending email
+            mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+            mimeMessageHelper.setFrom(sender);
+            mimeMessageHelper.setTo(details.getRecipient());
+            mimeMessageHelper.setText(details.getMessage()); // Plain text message
+            mimeMessageHelper.setSubject(details.getSubject());
+
+            // Sending the email
+            javaMailSender.send(mimeMessage);
+            return "Mail sent successfully";
+        } catch (MessagingException e) {
+            // Handle MessagingException
+            return "Error while sending mail: " + e.getMessage();
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------
+//Application Properties  (No Code Change)
+spring.datasource.url=jdbc:mysql://localhost:3306/loginpage
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.username=root
+spring.datasource.password=root
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.hibernate.ddl_auto=update
+
+
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=mailserviceforproject@gmail.com
+spring.mail.password=narmxqsexchxkara
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+-----------------------------------------------------------------------------------------------------
+//Controller
+//While Posting (Adding new users) add this code
+
+@Autowired
+    private SmtpService smtpservice;  // Inject SmtpService here
+
+
+@PostMapping("/Adduser")
+    public ResponseEntity<String>Adduser(@RequestBody User obj)
+    {
+        obj.setStatus("Active");
+        Emaildata emaildata=new Emaildata();
+        emaildata.setRecipient(obj.getEmailid());
+        emaildata.setSubject("User Login");
+        emaildata.setMessage("User Registered Successfully");
+        smtpservice.sendMail(emaildata);
+        userrepo.save(obj);
+        return new ResponseEntity<>("User added Successfully", HttpStatus.OK);
+    }
+-------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

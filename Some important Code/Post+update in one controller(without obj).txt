@@ -1,0 +1,23 @@
+@PostMapping("addworkstatus/{empid}")
+    public ResponseEntity<?> addworkstatus(@PathVariable Integer empid)
+    {
+        var empinfo=employeesRepo.findById(empid).orElseThrow(()->new RuntimeException("Employee id not Found"));
+        boolean workStatusExists = workstatusRepo.existsByEmployees(empinfo);
+        if( workStatusExists)
+        {
+            return new ResponseEntity<>("Workstatus Already added",HttpStatus.CONFLICT);
+        }
+        // Create a new Workstatus instance and set its properties
+        Workstatus workStatus = new Workstatus();
+        workStatus.setEmployees(empinfo);
+        workStatus.setPosteddate(LocalDateTime.now());
+        workStatus.setWorkstatus("Service Completed"); // Assuming there's a status field
+
+        // Save the work status
+        workstatusRepo.save(workStatus);
+
+        // Update employee status if needed
+        empinfo.setStatus("Service Completed");
+        employeesRepo.save(empinfo);
+        return new ResponseEntity<>("Workstatus Added Successfully", HttpStatus.OK);
+    }

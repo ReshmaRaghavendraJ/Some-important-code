@@ -1,0 +1,78 @@
+//Workstatus Controller
+
+@PostMapping("addworkstatus/{empid}")
+    public ResponseEntity<?> addworkstatus(@PathVariable Integer empid, @RequestBody Workstatus obj)
+    {
+        var empinfo=employeesRepo.findById(empid).orElseThrow(()->new RuntimeException("Employee id not Found"));
+        obj.setEmployees(empinfo);
+        boolean workStatusExists = workstatusRepo.existsByEmployees(empinfo);
+        if( workStatusExists)
+        {
+            return new ResponseEntity<>("Workstatus Already added",HttpStatus.CONFLICT);
+        }
+        workstatusRepo.save(obj);
+        return new ResponseEntity<>("Workstatus Added Successfully", HttpStatus.OK);
+    }
+
+----------------------------------------------------------------------------------------------------------------
+
+//Workstatus
+package com.example.Elderlycare.Entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Getter
+@Setter
+public class Workstatus
+{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer workstatusid;
+    private String workstatus;
+
+    public Workstatus()
+    {
+    }
+
+    public Workstatus(Integer workstatusid, String workstatus, Employees employees) {
+        this.workstatusid = workstatusid;
+        this.workstatus = workstatus;
+        this.employees = employees;
+    }
+
+    public Integer getWorkstatusid() {
+        return workstatusid;
+    }
+
+    public void setWorkstatusid(Integer workstatusid) {
+        this.workstatusid = workstatusid;
+    }
+
+    public String getWorkstatus() {
+        return workstatus;
+    }
+
+    public void setWorkstatus(String workstatus) {
+        this.workstatus = workstatus;
+    }
+
+    public Employees getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(Employees employees) {
+        this.employees = employees;
+    }
+
+    @ManyToOne
+    @JoinColumn(name="empid")
+    private Employees employees;
+
+}
+-----------------------------------------------------------------------------
+//WorkstatusRepo    
+
+ boolean existsByEmployees(Employees employees);

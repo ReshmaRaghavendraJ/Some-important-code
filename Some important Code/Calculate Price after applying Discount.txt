@@ -1,0 +1,2 @@
+Formula: To calculate Price
+Final Price=Original Price−(Original Price×Discount Percentage/100)

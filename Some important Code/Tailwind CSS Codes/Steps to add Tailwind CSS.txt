@@ -1,0 +1,40 @@
+Step-by-Step Installation of Tailwind CSS
+->npx create-react-app my-app
+->cd my-app
+->npm install -D tailwindcss@3
+->npx tailwindcss init
+This creates:
+1.tailwind.config.js (for customization)
+-----------------------------------------------------
+//tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+------------------------------------------------------------
+//index.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+--------------------------------------------------------------
+//index.js
+import './index.css';
+----------------------------------------------------------------
+//App.js
+function App() {
+  return (
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <h1 className="text-3xl font-bold text-blue-600">
+        Hello Tailwind CSS
+      </h1>
+    </div>
+  );
+}
+
+export default App;

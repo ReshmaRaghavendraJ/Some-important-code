@@ -1,0 +1,45 @@
+function issuescholarship(applicationid) {
+    axios
+    .put(`http://localhost:8080/issuescholarship/${applicationid}`)
+    .then((res) => {
+        toast.success(res.data);
+
+        // Store issued application ID and date in sessionStorage
+        const issuedApplications = JSON.parse(sessionStorage.getItem('issuedApplications')) || [];
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        issuedApplications.push({ id: applicationid, date: today });
+        sessionStorage.setItem('issuedApplications', JSON.stringify(issuedApplications));
+
+        // Refresh the eligible list
+        getEligibleApplications();
+    })
+    .catch((err) => {
+        toast.error(err.response.data);
+    });
+}
+
+const issuedApplications = JSON.parse(sessionStorage.getItem('issuedApplications')) || [];
+
+// Function to check if the scholarship has already been issued
+const hasBeenIssued = (applicationid) => {
+    return issuedApplications.some(app => app.id === applicationid);
+};
+
+return (
+    <>
+        {/* ... existing code ... */}
+        <Card.Body>
+            {elegibelist.map((item, index) => (
+                <div key={index}>
+                    {/* ... existing details ... */}
+                    {!hasBeenIssued(item.applicationid) && (
+                        <button className='btn btn-success' style={{ marginLeft: "350px" }} onClick={() => issuescholarship(item.applicationid)}>Issue Scholarship</button>
+                    )}
+                    <br />
+                </div>
+            ))}
+            <Link to="/" className='btn btn-danger' style={{ width: "100px", marginLeft: "400px" }}>Logout</Link><br />
+        </Card.Body>
+        {/* ... existing code ... */}
+    </>
+);

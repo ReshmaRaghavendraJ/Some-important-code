@@ -1,0 +1,15 @@
+To calculate EMI (Equated Monthly Installment) based on the required loan amount entered by the farmer, we will use the standard EMI formula:
+
+
+​
+ 
+where:
+
+P = Principal Loan Amount (Required Loan Amount)
+R = Monthly Interest Rate (Annual Rate / 12 / 100)
+N = Loan Tenure in Months
+Steps to Implement:
+Validate if the entered loan amount is within the allowed maxloanamt limit.
+Extract the interestrate and loantenure from the selected loan.
+Calculate EMI using the formula above.
+Display the calculated EMI to the farmer.

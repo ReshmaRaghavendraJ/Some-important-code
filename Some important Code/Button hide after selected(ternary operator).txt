@@ -1,0 +1,9 @@
+//Button show and hide after clicked 	
+
+   <td> 
+                        {
+                          item.accountno=="Waiting for Approval" ? (
+                            <button className='btn btn-success' onClick={()=>approvetocreateaccount(item.accountdetailsid)}>Approve</button>
+                          ) : null
+                        }
+                   </td>

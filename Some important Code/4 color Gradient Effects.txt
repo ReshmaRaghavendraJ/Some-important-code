@@ -1,0 +1,11 @@
+<h2
+                        className="fw-bold text-center mb-4"
+                        style={{
+                            background: 'linear-gradient(90deg, #f63625, #ff9603, #01d0ff, #40cf1c)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            display: 'inline-block'
+                        }}
+                    >
+                        Update Password
+                    </h2>

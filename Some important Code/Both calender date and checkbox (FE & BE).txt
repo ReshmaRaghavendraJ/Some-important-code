@@ -1,0 +1,36 @@
+//Back End
+
+ private String identification;  ->Checkbox(FE)
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Kolkata")
+    private LocalDateTime dob; ->Calender(FE)
+
+--------------------------------------------------------------------------------------------------------------------
+//Front End
+
+const handleCheckboxChange = (e) => {
+  setIdentification(e.target.value);  // Set it to a single value (no array)
+};
+
+
+const handleDatechange = (date) => {
+  const formattedDate = format(new Date(date), "yyyy-MM-dd'T'HH:mm:ss");
+  setDob(formattedDate);
+};
+
+ <label className='form-label'>Date of Birth:</label>
+  <input className='form-control'  type="datetime-local" value={dob}   onChange={(e) => handleDatechange(e.target.value)}/>
+
+<Form.Check
+      type="checkbox"
+      label="Aadharcard"
+      value="Aadharcard"
+      onChange={(e) => handleCheckboxChange(e)}
+    />
+
+<Form.Check
+      type="checkbox"
+      label="Driver's License"
+      value="Driver's License"
+      onChange={(e) => handleCheckboxChange(e)}
+    />

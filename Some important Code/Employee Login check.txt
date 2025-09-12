@@ -1,0 +1,20 @@
+
+// Employee Login check
+
+@GetMapping("/employeeLogin/{empid}/{password}")
+    public ResponseEntity<?> employeeLogin(@PathVariable Integer empid,@PathVariable String password)
+    {
+        try
+        {
+        var empinfo = employeesRepo.findById(empid).orElseThrow(() -> new RuntimeException("Employee id not Found"));
+        if (!empinfo.getPassword().equals(password)) {
+            return new ResponseEntity<>("Employee Password incorrect", HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>("Employee Logged in Successfully", HttpStatus.OK);
+        }
+        }
+        catch (RuntimeException e)
+        {
+            return new ResponseEntity<>("Employee id incorrect",HttpStatus.NOT_FOUND);
+        }
+    }

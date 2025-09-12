@@ -1,0 +1,9 @@
+//Based on  city selected, getCommodity details 
+
+useEffect(() => {
+        if (selectedCity) {
+            getCommodity(); // Fetch commodities when a city is selected
+        }
+    }, [selectedCity]);
+
+

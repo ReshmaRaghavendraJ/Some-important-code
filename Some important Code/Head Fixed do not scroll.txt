@@ -1,0 +1,4 @@
+Head Fixed:(It should not Scroll)
+classname='fixed top-0 left-0 w-full z-10'
+
+NOTE: z-10 It is compulsary to put because,the center contents should not scroll above the Header.

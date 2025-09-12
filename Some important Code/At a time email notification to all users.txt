@@ -1,0 +1,31 @@
+// while Registering , NGO's for conducting new camps &
+At a time All User get email notification 
+
+ @PostMapping("/addcamps/{cityid}/{ngoid}")
+    public ResponseEntity<?> addcamps(@PathVariable Integer cityid, @PathVariable Integer ngoid,@RequestBody Camps obj)
+    {
+        var cityinfo=cityRepo.findById(cityid).orElseThrow(()->new RuntimeException("City id not found"));
+        var ngoinfo=ngohospitalsRepo.findById(ngoid).orElseThrow(()->new RuntimeException("Ngoig not found"));
+        obj.setCity1(cityinfo);
+        obj.setNgohospitals1(ngoinfo);
+        campsRepo.save(obj);
+        // Fetch all users
+        List<User> allUsers = userRepo.findAll();
+
+        // Notify all users
+        for (User user : allUsers) {
+            String subject = "New Health Camp Available!";
+            String message = "Hello " + user.getName() + ",\n\n" +
+                    "A new health camp \"" + obj.getCampname() + "\" has been posted by " +
+                    ngoinfo.getTitle() + ".\n\n" +
+                    "Service Offered: " + obj.getServiceoffer() + "\n" +
+                    "Description: " + obj.getAboutcamp() + "\n" +
+                    "Date: " + obj.getCampdate() + "\n\n" +
+                    "Visit our platform to register.\n\n" +
+                    "Thank you,\nFree Medical Camp Finder Team";
+
+            Emaildata email = new Emaildata(user.getEmailid(), subject, message);
+            smtpService.sendMail(email);  // 🔥 This was missing
+        }
+        return new ResponseEntity<>("Camps details added Successfully",HttpStatus.OK);
+    }

@@ -1,0 +1,14 @@
+// Edit Profile
+function getstudprof()   /* For updating student Profile  we want student profiledetails - Updatestudprofile */
+{
+  axios
+  .get(`http://localhost:8080/getstudprof/${urid}`)
+  .then((res)=>{
+      setSemester(res.data.semester);
+      setStudentname(res.data.studentname);
+      setMobileno(res.data.mobileno);
+  })
+  .catch((err)=>{
+      toast.error(err.response.data);
+  });
+}

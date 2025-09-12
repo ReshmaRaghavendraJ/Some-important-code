@@ -1,0 +1,66 @@
+import axios from "axios";
+import {  useEffect, useState } from "react";
+import { Form } from "react-bootstrap";
+import { toast } from "react-toastify";
+
+export default function Addschemes()
+ {
+    const [citylist, setCitylist] = useState([]); 
+    const[search,setSearch]=useState('');
+    const[hidelist,setHidelist]=useState(false);
+
+    useEffect(()=>{
+      displayallcities();
+    },[])
+
+  function displayallcities()
+  {
+      axios
+      .get("http://localhost:8080/displayallcities")
+      .then((res)=>{
+        setCitylist(res.data);
+        setHidelist(true);
+      })
+      .catch((err)=>{
+        toast.error(err.response.data);
+      })
+  }
+
+
+   const searchitems=citylist.filter((item)=>
+            item.cityname.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <>
+      <Form>
+      <input className="form-control mt-3" style={{width:"500px",marginLeft:"200px"}} 
+       type="text" value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search items..." onKeyDown={displayallcities}/>
+<table className="table table-striped m-3 border p-3">
+  <thead>
+    <tr>
+      <th>City id</th>
+      <th>City Name</th>
+    </tr>
+  </thead>
+  <tbody>
+{
+  searchitems.length ? 
+  (
+           searchitems.map((item)=>(
+            <tr>
+            <td>{item.cityid}</td>
+            <td> {item.cityname}</td>
+             </tr>
+           ))
+          ):(
+            hidelist &&(
+              <p  className="text-danger fw-bold">Not Found...!</p>
+          )
+            )      
+}
+        </tbody>
+    </table>
+      </Form>
+    </>
+  )
+}

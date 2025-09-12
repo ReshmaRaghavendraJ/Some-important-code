@@ -1,0 +1,184 @@
+1)pip install django
+2)pip install djangorestframework
+3)pip install django-cors-headers
+4)django-admin startproject myproject(project settings folders are kept here...)
+5)cd myproject
+6)python manage.py startapp myapp(main project name)
+7)Add App to Installed Apps:
+In myproject/settings.py:
+->INSTALLED_APPS = [
+    ...
+    'myapp',
+    'rest_framework',
+   'corsheaders',	
+]
+8)Create a Model:
+In myapp/models.py:
+->from django.db import models
+
+class Student(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    age = models.IntegerField()
+
+9)Myproject->settings.py:
+DATABASES = {
+    'default': {
+       'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'student',  # Replace with your MySQL database name
+        'USER': 'root',       # Replace with your MySQL username
+        'PASSWORD': 'root',   # Replace with your MySQL password
+        'HOST': 'localhost',          # Use 'localhost' if running locally, or your DB server IP
+        'PORT': '3307',  
+    }
+}
+10)Create a Database on SQl yog(student)
+11)Run only once: (Before running, make a correct  path Inside myapp should be displayed in VS Code)
+->python manage.py makemigrations myapp
+->python manage.py migrate myapp
+
+-----------------------------------------------------------------------------------------------------------------------
+Steps to create Serializers:
+1)Create a serializers.py file in your app directory
+In your Django app (myapp/), create a new file:
+
+
+myapp/
+├── models.py
+├── views.py
+├── serializers.py  ✅ <-- create this
+├── ...
+
+2)//Inside Serializer.py
+from rest_framework import serializers
+from .models import Student
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = ('id','name','email','age')    OR      fields = '__all__'
+(Similarly as many tables we want we have to create)
+
+3)myproject/
+├── myapp/
+│   ├── views.py ✅ <-- here
+
+4)//views.py
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Student
+from .serializers import StudentSerializer
+from django.shortcuts import get_object_or_404
+
+# GET all students or POST new student
+@api_view(['GET', 'POST'])
+def student_list_create(request):
+    if request.method == 'GET':
+        students = Student.objects.all()
+        serializer = StudentSerializer(students, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        serializer = StudentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# GET/PUT/DELETE a specific student
+@api_view(['GET', 'PUT', 'DELETE'])
+def student_detail(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+    
+    if request.method == 'GET':
+        serializer = StudentSerializer(student)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = StudentSerializer(student, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        student.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+      OR
+
+4)//views.py
+
+from django.shortcuts import render
+from rest_framework import viewsets
+from .models import Admin,User,Commonnutrition,Disease,Nutritionrequirements,Testlabvalues,Feedback
+from .serializers import AdminSerializer,UserSerializer,CommonnutritionSerializer,DiseaseSerializer,NutritionrequirementsSerializer,TestlabvaluesSerializer,FeedbackSerializer
+
+# Create your views here.
+
+class AdminViewSet(viewsets.ModelViewSet):
+    queryset = Admin.objects.all()
+    serializer_class = AdminSerializer  
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer  
+
+--------------------------------------------------------
+
+
+5)create urls.py inside myapp 
+//urls.py
+
+# myapp/urls.py
+from django.urls import path
+from .views import student_list_create, student_detail
+
+urlpatterns = [
+    path('students/', student_list_create, name='student-list-create'),
+    path('students/<int:pk>/', student_detail, name='student-detail'),
+]
+ 
+
+	OR
+
+5)//urls.py
+
+from django.urls import path,include
+from rest_framework.routers import DefaultRouter
+from .views import AdminViewSet,UserViewSet
+
+router=DefaultRouter()
+router.register(r'admin',AdminViewSet,basename="admin")  
+router.register(r'user',UserViewSet,basename="user")   
+
+urlpatterns = [
+    path(' ',include(router.urls)),
+]
+
+-------------------------------------------------------------------
+
+6)//Also include this in your main project’s urls.py means --> myproject->urls.py
+//urls.py(Already exists in myproject file)
+
+from django.urls import path,include
+path('api/', include('myapp.urls')),  # prefix all API URLs with /api/  -->Add this line
+
+OR
+
+6)//urls.py(Already exists in myproject file)
+
+from django.urls import path,include
+ path(' ',include("recomandation.urls"))
+
+----------------------------------------------------------------------
+
+7)run this command:
+python manage.py runserver 
+
+Next->Check the api in post man
+
+------------------------------------------------------------------------------------------------------------------
+
+

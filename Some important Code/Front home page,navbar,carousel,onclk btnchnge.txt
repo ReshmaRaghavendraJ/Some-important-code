@@ -1,0 +1,89 @@
+import React from 'react'
+import Nav from 'react-bootstrap/Nav';
+import { Link } from 'react-router-dom';
+import Carousel from 'react-bootstrap/Carousel';
+import { useState } from 'react';
+
+
+export default function Home()
+ {
+  const [activeTab, setActiveTab] = useState('/');
+
+  const handleSelect = (selectedKey) => {
+    setActiveTab(selectedKey); // Update the active tab when a new tab is selected
+  };
+
+  const navLinkStyle = (tab) => ({
+    color: activeTab === tab ? 'purple' : 'white', // Change color based on active tab
+    backgroundColor: activeTab === tab ? 'white' : 'transparent',
+    fontWeight: 'bold',
+    fontSize: '18pt',
+    fontFamily: 'serif',
+  });
+
+  return (
+    <>
+    <div>
+     <Nav variant="tabs"   activeKey={activeTab} onSelect={handleSelect} style={{height:"105px",backgroundColor:"purple",paddingTop:"50px",paddingLeft:"10px"}}>
+      <Nav.Item>
+        <Nav.Link as={Link} to="/" eventKey="/" style={navLinkStyle('/')} onClick={() => handleSelect('/')}>Home</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link as={Link} to="/About" eventKey="/About" style={navLinkStyle('/About')} onClick={() => handleSelect('/About')}>About</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link as={Link} to="/Login"  eventKey="/Login" style={navLinkStyle('/Login')} onClick={() => handleSelect('/Login')}>Login</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link as={Link} to="/Register"  eventKey="/Register" style={navLinkStyle('/Register')} onClick={() => handleSelect('/Register')}>Register</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link as={Link} to="/Contact" eventKey="/Contact" style={navLinkStyle('/Contact')} onClick={() => handleSelect('/Contact')}>Contact</Nav.Link>
+      </Nav.Item>
+      <h1 style={{color:"white",marginLeft:"400px",fontStyle:"italic",fontWeight:"revert",textShadow:"2px 2px 4px rgba(0.2, 0, 0.3, 0.5)"}}>Elderly Care</h1>
+      <img src="https://t3.ftcdn.net/jpg/00/50/69/64/360_F_50696463_VeMLKpvmMmWAQk6ArMUf7okMGey66JsS.jpg" alt="logo" width="100px" height="80px" style={{marginLeft:"10px",marginTop:"-25px"}}/>
+    </Nav>
+    </div>
+
+<div>
+<Carousel>
+<Carousel.Item interval={1000}>
+<img
+              className="d-block w-100"
+              src="https://www.silvercentury.org/wp-content/uploads/2019/07/young-man-elderly-woman-visiting-1080937-print-1.jpg" 
+              alt="First slide" style={{width:"200px"}}
+            />
+  <Carousel.Caption>
+    <h3>First slide label</h3>
+    <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+  </Carousel.Caption>
+</Carousel.Item>
+<Carousel.Item interval={500}>
+<img
+              className="d-block w-100"
+              src="https://www.griswoldcare.com/wp-content/uploads/2024/04/Senior-Man-Receiving-Groceries.jpg" // Placeholder image URL
+              alt="First slide"
+            />
+  <Carousel.Caption>
+    <h3>Second slide label</h3>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+  </Carousel.Caption>
+</Carousel.Item>
+<Carousel.Item>
+<img
+              className="d-block w-100"
+              src="https://www.homecareassistanceroseville.com/wp-content/uploads/2018/06/AdobeStock_97047441.jpeg" // Placeholder image URL
+              alt="First slide"
+            />
+  <Carousel.Caption>
+    <h3>Third slide label</h3>
+    <p>
+      Praesent commodo cursus magna, vel scelerisque nisl consectetur.
+    </p>
+  </Carousel.Caption>
+</Carousel.Item>
+</Carousel>
+</div>
+</>
+  )
+}

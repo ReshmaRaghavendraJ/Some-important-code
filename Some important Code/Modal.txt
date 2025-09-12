@@ -1,0 +1,119 @@
+import axios from 'axios';
+import React, { useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify';
+import { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+
+
+export default function Viewreplyqueries()
+ {
+  const[querylist,setQuerylist]=useState([]);
+  const[reply,setReply]=useState('');
+  const[showmodal,setShowModal]=useState(false);
+  const [selectedQueryId, setSelectedQueryId] = useState(null);
+
+  useEffect(()=>{
+    Getallquery(); 
+  })
+
+  function Getallquery()
+  {
+      axios
+      .get("http://localhost:8080/Getallquery")
+    .then((res)=>{
+      setQuerylist(res.data);
+    })
+    .catch((err)=>{
+      toast.error(err.response.data);
+    });
+  }
+
+  function updatequery ()     /* Put or Update Query reply date  */
+  {
+    const obj={reply};
+    axios
+      .put(`http://localhost:8080/updatequery/${selectedQueryId}`,obj)
+    .then((res)=>{
+      toast.success(res.data);
+      setShowModal(false);
+      Getallquery();
+    })
+    .catch((err)=>{
+      toast.error(err.response.data);
+    });
+  }
+
+  function handlereplyclick(queryid)
+  {
+    setSelectedQueryId(queryid);
+    setShowModal(true);  
+  }
+
+  return (
+    <>
+    <div className='addfacility form-group'><br></br>
+    <h1 style={{color:"purple",textShadow:"2px 2px 4px rgba(0.5, 0.4, 0, 0.6)",marginLeft:"100px"}}>View and Reply Queries</h1><br></br>
+    
+    <table>
+      <thead>
+        <tr>
+          <th style={{ textAlign: 'Left', paddingLeft: '10px'}}>Query id</th>
+          <th style={{ textAlign: 'Left', paddingLeft: '20px'}}>Name</th>
+          <th style={{ textAlign: 'Left', paddingLeft: '20px'}}>Email id</th>
+          <th style={{ textAlign: 'Left', paddingLeft: '20px'}}>Contact no</th>
+          <th style={{ textAlign: 'Left', paddingLeft: '20px'}}>Query</th>
+          <th style={{ textAlign: 'Left', paddingLeft: '20px'}}>Posted Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          querylist.map((item,index)=>{
+            return(
+              <tr key={index}>
+              <td style={{ textAlign: 'Left', paddingLeft: '10px'}}>{item.queryid}</td>
+              <td style={{ textAlign: 'Left', paddingLeft: '20px'}}>{item.name}</td>
+              <td style={{ textAlign: 'Left', paddingLeft: '20px'}}>{item.emailid}</td>
+              <td style={{ textAlign: 'Left', paddingLeft: '20px'}}>{item.contactno}</td>
+              <td style={{ textAlign: 'Left', paddingLeft: '20px'}}>{item.query}</td>
+              <td style={{ textAlign: 'Left', paddingLeft: '20px'}}>{item.posteddate}</td>
+              <button className='btn btn-success me-4' style={{marginLeft:"100px"}} onClick={()=>handlereplyclick(item.queryid)}>Reply</button>
+              </tr>
+            )
+          })  
+        }
+      </tbody>
+    </table>
+    </div>
+
+    <div
+      className="modal show"
+      style={{ display: 'block', position: 'initial' }}
+    >
+      <Modal show={showmodal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Reply Query:</Modal.Title>
+        </Modal.Header>
+
+        <div className="form-group">
+            <label style={{width:"400px",marginLeft:"20px"}}>Reply to Query:</label>
+            <input
+              type="text"
+              className="form-control"
+              value={reply} style={{width:"400px",marginLeft:"20px"}}
+              onChange={(e) => setReply(e.target.value)}
+            />
+          </div>
+
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
+          <Button variant="primary" onClick={updatequery}>Save changes</Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+     
+    <Link to="/" className='btn btn-warning me-4' style={{marginLeft:"1200px"}}>Logout</Link>
+    </>  
+  )
+}

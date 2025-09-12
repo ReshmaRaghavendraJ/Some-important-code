@@ -1,0 +1,117 @@
+import React, {  useState } from 'react'
+import Userdashboard from './Userdashboard'
+import Form from 'react-bootstrap/Form';
+import { useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import Dropdown from 'react-bootstrap/Dropdown';
+
+
+export default function Viewemployees() 
+{
+    const[address,setAddress]=useState('');
+    const[deliveryaddress,setDeliveryaddress]=useState('');
+    const[servicelist,setServicelist]=useState([]);  //Service list in database
+    const[selectedContents,setSelectedContents]=useState(''); //Checklist array
+
+    const ursid=sessionStorage.getItem('userid');
+    
+    useEffect(()=>{
+    getallservices();
+    },[]);
+
+
+    function getallservices()   /* get all Services in checkbox form */
+    {
+        axios
+          .get("http://localhost:8080/getallservices")
+          .then((res)=>{
+          setServicelist(res.data);
+          })
+          .catch((err)=>{
+            toast.error(err.response.data);
+          });
+    }
+
+    const handleCheckboxChange = (serviceid) => {     /* Checkbox */
+        if (selectedContents===serviceid) {
+          setSelectedContents('');
+        } else if (selectedContents) {
+          alert('Please choose only one checkbox!');
+      } else {
+          setSelectedContents(serviceid);
+      }
+      };
+
+   
+
+      function updateaddress() {         /* Combining both updateuseraddress and updatedeliveryaddress function into one single funtion */
+        const userObj = { address };
+        const serviceObj = { deliveryaddress };
+      
+        const updateuseraddress = axios.put(`http://localhost:8080/updateuseraddress/${ursid}`, userObj);
+        const updatedeliveryaddress = axios.put(`http://localhost:8080/updatedeliveryaddress/${selectedContents}`, serviceObj);
+      
+        Promise.all([updateuseraddress, updatedeliveryaddress])
+          .then(() => {
+            toast.success('Address added successfully');
+          })
+          .catch((err) => {
+            toast.error(err.response.data);
+          });
+      }
+ 
+      function handleSubmit() {
+        if (!selectedContents) {
+          alert('Please select a service!');
+      } else {
+        updateaddress();  
+      }
+    }
+
+    function clearAll()
+    {
+      setAddress("");
+      setDeliveryaddress("");
+      setSelectedContents("");
+    }
+
+  return (
+    <>
+  
+         <Userdashboard/>
+         <h1 style={{color:"purple",padding:"20px",marginLeft:"500px"}}>Select Package Contents</h1>
+        
+         <Form.Group className="mb-3">
+        <Form.Label style={{marginLeft:"20px"}}>Pickup Address:</Form.Label>
+        <Form.Control type="text" value={address} onChange={(e)=>setAddress(e.target.value)} style={{marginLeft:"20px",width:"1300px"}} placeholder='Search pickup location'/>
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label style={{marginLeft:"20px"}}>Delivery Address:</Form.Label>
+        <Form.Control type="text" value={deliveryaddress} onChange={(e)=>setDeliveryaddress(e.target.value)} style={{marginLeft:"20px",width:"1300px"}} placeholder='Search delivery location'/>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label style={{marginLeft:"20px"}}>Select package Contents: <br></br>e.g. Food,Documents</Form.Label>
+        <Dropdown>
+          <Dropdown.Toggle id="dropdown-custom-components" style={{ marginLeft: '20px' }}>
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            {servicelist.map((item, index) => (
+              <Dropdown.ItemText key={index}>
+                <Form.Check
+                  type="checkbox"
+                  label={item.servicename}
+                  checked={selectedContents===item.serviceid}
+                  onChange={() => handleCheckboxChange(item.serviceid)}
+                />
+              </Dropdown.ItemText>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+      </Form.Group>
+      <button className='btn btn-primary' style={{ width:"100px",marginLeft:"100px"}} onClick={handleSubmit}>Submit</button>
+      <button className='btn btn-secondary' style={{ width:"100px",marginLeft:"100px"}} onClick={clearAll}>Cancel</button>
+    </>
+  )
+}

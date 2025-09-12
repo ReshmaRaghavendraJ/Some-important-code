@@ -1,0 +1,114 @@
+import React, {  useState } from 'react'
+import Userdashboard from './Userdashboard'
+import Form from 'react-bootstrap/Form';
+import { useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+
+
+export default function Packagecontents() 
+{
+  const location = useLocation();
+    const[address,setAddress]=useState(location.state?.address || '');
+    const[deliveryaddress,setDeliveryaddress]=useState('');
+    const[servicelist,setServicelist]=useState([]);  //Service list in database
+    const[selectedContents,setSelectedContents]=useState(''); //Checklist array
+    const [isEditingAddress, setIsEditingAddress] = useState(false); // State to toggle address editing
+
+    const ursid=sessionStorage.getItem('userid');
+    
+    useEffect(()=>{
+    getallservices();
+    },[]);
+
+
+    function getallservices()   /* get all Services in checkbox form */
+    {
+        axios
+          .get("http://localhost:8080/getallservices")
+          .then((res)=>{
+          setServicelist(res.data);
+          })
+          .catch((err)=>{
+            toast.error(err.response.data);
+          });
+    }
+
+    const handleRadioChange = (serviceid) => {
+      setSelectedContents(serviceid); // Set the selected service ID
+    };
+
+   
+
+      function updateaddress() {         /* Combining both updateuseraddress and updatedeliveryaddress function into one single funtion */
+        const userObj = { address };
+        const serviceObj = { deliveryaddress };
+      
+        const updateuseraddress = axios.put(`http://localhost:8080/updateuseraddress/${ursid}`, userObj);
+        const updatedeliveryaddress = axios.put(`http://localhost:8080/updatedeliveryaddress/${selectedContents}/${ursid}`, serviceObj);
+      
+        Promise.all([updateuseraddress, updatedeliveryaddress])
+          .then(() => {
+            toast.success('Address added successfully');
+            clearAll();
+          })
+          .catch((err) => {
+            toast.error(err.response.data);
+          });
+      }
+ 
+      function handleSubmit() {
+        if (!selectedContents) {
+          alert('Please select a service!');
+      } else {
+        updateaddress();  
+      }
+    }
+
+    function clearAll()
+    {
+      setAddress("");
+      setDeliveryaddress("");
+      setSelectedContents("");
+    }
+
+  return (
+    <>
+         <Userdashboard/>
+         <h1 style={{color:"purple",padding:"20px",marginLeft:"500px"}}>Select Package Contents</h1>
+        
+         <Form.Group className="mb-3">  
+        <Form.Label style={{marginLeft:"20px"}}>Pickup Address:</Form.Label>
+        <Form.Control type="text" value={address} onChange={(e)=>setAddress(e.target.value)} style={{marginLeft:"20px",width:"1300px"}} placeholder='Search pickup location'  readOnly={!isEditingAddress} /><br></br>
+        <button className='btn btn-primary' style={{ width:"100px",marginLeft:"100px"}} onClick={() => setIsEditingAddress(!isEditingAddress)}
+        >
+          {isEditingAddress ? 'Save' : 'Change'}</button>
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label style={{marginLeft:"20px"}}>Delivery Address:</Form.Label>
+        <Form.Control type="text" value={deliveryaddress} onChange={(e)=>setDeliveryaddress(e.target.value)} style={{marginLeft:"20px",width:"1300px"}} placeholder='Search delivery location'/>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label style={{marginLeft:"20px"}}>Select package Contents: <br></br>e.g. Food,Documents</Form.Label>
+        <div style={{ display: 'flex', marginLeft: '20px' }}>
+            {servicelist.map((item, index) => (
+              <div key={index}  style={{ marginRight: '20px'}}>
+                <Form.Check
+                  type="radio"
+                  label={item.servicename}
+                  checked={selectedContents===item.serviceid}
+                  onChange={() => handleRadioChange(item.serviceid)}
+                />
+              </div>
+            ))}
+             </div>
+      </Form.Group>
+      <button className='btn btn-primary' style={{ width:"100px",marginLeft:"100px"}} onClick={handleSubmit}>Submit</button>
+      <button className='btn btn-secondary' style={{ width:"100px",marginLeft:"100px"}} onClick={clearAll}>Cancel</button>
+      <Link to="/" className="btn btn-danger" style={{marginLeft:"100px"}}>Logout</Link><br></br>
+    </>
+  )
+}

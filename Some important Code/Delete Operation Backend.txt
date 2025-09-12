@@ -1,0 +1,7 @@
+    @DeleteMapping("/deletestate/{stateid}")
+    public ResponseEntity<?> deletestate(@PathVariable Integer stateid)
+    {
+        var stateinfo=stateRepo.findById(stateid).orElseThrow(()->new RuntimeException("Stateid not found"));
+        stateRepo.delete(stateinfo);
+        return new ResponseEntity<>("State Deleted Successfully",HttpStatus.OK);
+    }

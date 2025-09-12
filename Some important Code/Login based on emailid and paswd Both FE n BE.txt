@@ -1,0 +1,155 @@
+ @GetMapping("/userlogin/{emailid}/{password}")
+    public ResponseEntity<?> userlogin(@PathVariable String emailid, @PathVariable String password) {
+        try {
+            // Find the user by email ID
+            User userinfo = userRepo.findByEmailid(emailid).orElseThrow(() -> new RuntimeException("Email ID not found"));
+
+            // Check if the password matches
+            if (!userinfo.getPassword().equals(password)) {
+                return new ResponseEntity<>("User Password is incorrect", HttpStatus.UNAUTHORIZED);
+            } else {
+                // Return user info if login is successful
+                return new ResponseEntity<>(userinfo, HttpStatus.OK);
+            }
+        } catch (RuntimeException e) {
+            // Handle errors gracefully
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------
+import React from 'react'
+import { Link } from 'react-router-dom'
+import Nav from 'react-bootstrap/Nav';
+import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import Card from 'react-bootstrap/Card';
+import pic1 from './pic1.jpg';
+
+export default function Userlogin() 
+{
+    // const[userid,setUserid]=useState('');
+    const[password,setPassword]=useState('');
+    const navigate = useNavigate(); // Initialize navigate
+    const location = useLocation();
+    const [activeTab, setActiveTab] = useState(location.pathname);
+    const [emailid, setEmailid] = useState(''); // State for email input
+    const[userlogin,setUserlogin]=useState({});
+
+    useEffect(() => {
+        setActiveTab(location.pathname); // Update active tab on location change
+    }, [location.pathname]);
+    
+    const navLinkStyle = (tab) => ({
+      color: activeTab === tab ? 'maroon' : 'white', // Change color based on active tab
+      backgroundColor: activeTab === tab ? 'white' : 'transparent',
+      fontWeight: 'bold',
+      fontSize: '18pt',
+      fontFamily: 'serif',
+    });
+
+    function clearAll()
+  {
+      setEmailid("");
+      setPassword("");
+  }
+
+  function logincheck()  /* User Login Check */
+  {
+    if(emailid==="")
+      {
+        toast.error("please enter emailid");
+        return;
+      }
+      if(password==="")
+        {
+          toast.error("please enter password");
+          return;
+        }
+        axios
+        .get(`http://localhost:8080/userlogin/${emailid}/${password}`)
+        .then((res)=>{
+          setUserlogin(res.data);
+          const userid=res.data.userid;
+          sessionStorage.setItem('userid',userid);
+          clearAll();
+          navigate('/Userdashboard'); 
+        })
+        .catch((err)=>{
+          toast.error(err.response.data);
+        });
+  }
+
+
+
+  return (
+    <>
+     <div>
+    
+    <Nav activeKey={activeTab} variant="tabs"  style={{height:"105px",backgroundColor:"maroon",paddingTop:"50px",paddingLeft:"10px"
+    }}>
+       
+     
+     <Nav.Item>
+       <Nav.Link as={Link} to="/" eventKey="/" style={navLinkStyle('/')}>Home</Nav.Link>
+     </Nav.Item>
+     <Nav.Item>
+       <Nav.Link as={Link} to="/About" eventKey="/About" style={navLinkStyle('/About')}>About</Nav.Link>
+     </Nav.Item>
+     <Nav.Item>
+       <Nav.Link as={Link} to="/Adminlogin"  eventKey="/Adminlogin" style={navLinkStyle('/Adminlogin')}>Adminlogin</Nav.Link>
+     </Nav.Item>
+     <Nav.Item>
+       <Nav.Link as={Link} to="/Userlogin"  eventKey="/Userlogin" style={navLinkStyle('/Userlogin')}>Userlogin</Nav.Link>
+     </Nav.Item>
+     <Nav.Item>
+       <Nav.Link as={Link} to="/Employeelogin"  eventKey="/Employeelogin" style={navLinkStyle('/Employeelogin')}>Employeelogin</Nav.Link>
+     </Nav.Item>
+     <Nav.Item>
+       <Nav.Link as={Link} to="/Register"  eventKey="/Register" style={navLinkStyle('/Register')}>Register</Nav.Link>
+     </Nav.Item>
+     <Nav.Item>
+       <Nav.Link as={Link} to="/Contact" eventKey="/Contact" style={navLinkStyle('/Contact')}>Contact</Nav.Link>
+     </Nav.Item>
+     <h1 style={{ color: 'white', marginLeft: '1000px', fontStyle: 'italic', fontWeight: 'revert', textShadow: '2px 2px 4px rgba(0.2, 0, 0.3, 0.5)', marginTop: '-50px' }}>InstaCo</h1>
+     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTW-qC7-FJRadcDmOHtp1lLZkc_jz7Qi_fZEsAcEc4NPAe21Uz8yJW3CrPvhFGpNHHkBYw&usqp=CAU" alt="logo" width="100px" height="80px" style={{ marginLeft: '1200px', marginTop: '-90px' }} />
+   </Nav>
+   </div>
+
+   <img src={pic1} alt="pic1" width="100%"/>
+
+   <Card className='userlogincard'>
+      <Card.Body>
+        <Card.Title><h2 style={{color:"Green",marginLeft:"100px"}}>User Login Page</h2></Card.Title>
+        <Form style={{marginLeft:"20px",marginRight:"20px"}}>
+      <Form.Group className="mb-3" ><br></br>
+        <Form.Label><h5>Emailid:<i class="bi bi-file-person-fill"></i></h5></Form.Label>
+        <Form.Control type="text" value={emailid} onChange={(e)=>setEmailid(e.target.value)} />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label><h5>Password:<i class="bi bi-file-lock-fill"></i></h5></Form.Label>
+        <Form.Control type="password" rows={3}  value={password} onChange={(e)=>setPassword(e.target.value)} placeholder='*****'/>
+      </Form.Group>
+      </Form>
+      <div className='btnss'>
+      <Button variant="primary"  onClick={logincheck} style={{marginLeft:"20px",marginRight:"20px"}}>
+      Submit
+      </Button>
+      <Button variant="secondary"  onClick={clearAll} style={{marginLeft:"20px",marginRight:"20px"}}>
+      Cancel
+      </Button>
+      </div> 
+      </Card.Body>
+      </Card><br></br>
+    </>
+  )
+}
