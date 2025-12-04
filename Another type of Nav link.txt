@@ -1,0 +1,23 @@
+import React from 'react';
+import Nav from 'react-bootstrap/Nav';
+import { NavLink } from 'react-router-dom';
+
+export default function Home() {
+  return (
+    <div>
+    <Nav variant="tabs">
+           <Nav.Item>
+        <NavLink to="/" className={({ isActive }) => (isActive ? 'active' : '')}>
+          <Nav.Link eventKey="/">Home</Nav.Link>
+        </NavLink>
+      </Nav.Item>
+      <Nav.Item>
+        <NavLink to="/about" className={({ isActive }) => (isActive ? 'active' : '')}>
+          <Nav.Link eventKey="/about">About</Nav.Link>
+        </NavLink>
+      </Nav.Item>
+    </Nav>
+    </div>
+  );
+}     Not tried how it will work
+---------------------------------------------------------------------------------------------------------------------------

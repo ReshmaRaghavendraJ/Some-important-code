@@ -1,0 +1,54 @@
+//String datatype with 12 digit Random Number Generating
+
+   @Id
+    private String accountno;
+
+ public Accountdetails()
+    {
+        generateaccountno();
+    }
+
+    private void generateaccountno() {
+        Random random = new Random();
+        long rndvalue = 100000000000L + (long) (random.nextDouble() * 900000000000L); // Ensures 12 digits
+        this.accountno = String.valueOf(rndvalue);
+    }
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//Bcrypt the accountno
+
+ @PostMapping("/createaccount/{bankid}/{userid}")
+    public ResponseEntity<?> createaccount(@PathVariable Integer bankid, @PathVariable Integer userid, @RequestBody Accountdetails obj)
+    {
+        var bankinfo=bankRepo.findById(bankid).orElseThrow(()->new RuntimeException("Bank id not found"));
+        var userinfo=userRepo.findById(userid).orElseThrow(()->new RuntimeException("User id not found"));
+        obj.getAccountno();  // Ensure the account number is generated
+        String actnostring=String.valueOf(obj.getAccountno());
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
+        String hashedAccountNo = (bCrypt.encode(actnostring));
+        obj.setAccountno(String.valueOf(hashedAccountNo));
+        obj.setBank3(bankinfo);
+        obj.setUser1(userinfo);
+        obj.setStatus("Active");
+        accountdetailsRepo.save(obj);
+        return new ResponseEntity<>("Account created Successfully", HttpStatus.OK);
+    }
+
+(OR)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+//Same above code but 2 lines removed
+
+@PostMapping("/createaccount/{bankid}/{userid}")
+    public ResponseEntity<?> createaccount(@PathVariable Integer bankid, @PathVariable Integer userid, @RequestBody Accountdetails obj)
+    {
+        var bankinfo=bankRepo.findById(bankid).orElseThrow(()->new RuntimeException("Bank id not found"));
+        var userinfo=userRepo.findById(userid).orElseThrow(()->new RuntimeException("User id not found"));
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
+        String hashedAccountNo = (bCrypt.encode(obj.getAccountno()));
+        obj.setAccountno(hashedAccountNo);
+        obj.setBank3(bankinfo);
+        obj.setUser1(userinfo);
+        obj.setStatus("Active");
+        accountdetailsRepo.save(obj);
+        return new ResponseEntity<>("Account created Successfully", HttpStatus.OK);
+    }

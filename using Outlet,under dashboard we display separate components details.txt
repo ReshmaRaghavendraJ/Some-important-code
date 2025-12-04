@@ -1,0 +1,87 @@
+import React from 'react'
+import Home from './Components/Home'
+import {BrowserRouter as Router,Routes,Route} from 'react-router-dom'
+import {ToastContainer} from 'react-toastify'
+import About from './Components/About'
+import Register from './Components/Register'
+import Login from './Components/Login'
+import Contact from './Components/Contact'
+import Admindashboard from './Components/Admindashboard'
+import Userdashboard from './Components/Userdashboard'
+import Addcity from './Components/Addcity'
+import Addbank from './Components/Addbank'
+import Addmanagers from './Components/Addmanagers'
+import Addservices from './Components/Addservices'
+
+  
+
+export default function App() {
+  return (
+    <>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home/>}/>
+        <Route path="/About" element={<About/>}/>
+        <Route path="/Register" element={<Register/>}/>
+        <Route path="/Login" element={<Login/>}/>
+        <Route path="/Contact" element={<Contact/>}/>
+        <Route path="Admindashboard" element={<Admindashboard/>}>
+        <Route path="Addcity" element={<Addcity/>}/>
+        <Route path="Addbank" element={<Addbank/>}/>
+        <Route path="Addmanagers" element={<Addmanagers/>}/>
+        <Route path="Addservices" element={<Addservices/>}/>
+        </Route>
+        <Route path="/Userdashboard" element={<Userdashboard/>}/>
+      </Routes>
+    </Router>
+    <ToastContainer/>
+    </>
+  )
+}
+------------------------------------------------------------------------------------------------------------
+import React from 'react'
+import Nav from 'react-bootstrap/Nav';
+import { Link, Outlet} from 'react-router-dom';
+import { useState } from 'react';
+import homeicon from '../Components/homeicon.png';
+import bank from '../Components/bank.jpg';
+import Addcity from './Addcity';
+
+
+export default function Admindashboard() 
+{
+    const [activeKey, setActiveKey] = useState(''); 
+
+    const handleSelect = (selectedKey) => {
+        setActiveKey(selectedKey); // Update active link
+      };
+
+
+  return (
+    <>
+    <div className='navbars'> 
+     <Nav variant="pills" activeKey={activeKey} onSelect={handleSelect}>
+       <Nav.Item>
+       <img src={homeicon} alt="homeimg" style={{width:"50px",marginTop:"50px",marginLeft:"10px"}}/> 
+        <Nav.Link as={Link} to="Addcity" eventKey="Addcity" style={{marginTop:"-53px",marginLeft:"65px"}}    className={`navbar-link ${activeKey === 'Addcity' ? 'active' : ''}`}>Addcity</Nav.Link> 
+       </Nav.Item>
+       <Nav.Item>
+       <Nav.Link as={Link} to="Addbank" eventKey="Addbank" className={`navbar-link ${activeKey === 'Addbank' ? 'active' : ''}`}>Addbank</Nav.Link> 
+       </Nav.Item>
+       <Nav.Item>
+       <Nav.Link as={Link} to="Addmanagers" eventKey="Addmanagers" className={`navbar-link ${activeKey === 'Addmanagers' ? 'active' : ''}`}>Addmanagers</Nav.Link> 
+       </Nav.Item>
+       <Nav.Item>
+       <Nav.Link as={Link} to="Addservices" eventKey="Addservices" className={`navbar-link ${activeKey === 'Addservices' ? 'active' : ''}`}>Addservices</Nav.Link> 
+       </Nav.Item>
+     </Nav>
+     <h1 style={{color:"white"}}>Admin Dashboard</h1>
+     <img src={bank} alt="bankimg" style={{marginLeft:"300px"}}/>
+     </div>
+
+     <Addcity/>
+     <Outlet/>
+     </>
+  )
+}
+

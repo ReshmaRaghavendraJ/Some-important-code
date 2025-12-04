@@ -1,0 +1,33 @@
+//To View and Download the document
+
+{/* Document Preview */}
+{item.doc && (
+  <div className="mt-4 text-center">
+    <h4 className="text-md font-semibold text-gray-700 mb-2">Document:</h4>
+
+    {/* If document is a PDF */}
+    {item.doc.startsWith("data:application/pdf") ? (
+      <iframe
+        src={item.doc}
+        className="w-full h-60 border rounded-lg shadow"
+        title="PDF Preview"
+      ></iframe>
+    ) : (
+      /* If document is an image */
+      <img
+        src={item.doc}
+        alt="Document"
+        className="w-40 mx-auto border rounded-lg shadow"
+      />
+    )}
+
+    {/* Download Button */}
+    <a
+      href={item.doc}
+      download={`document_${item.appliedpensionid}`}
+      className="mt-3 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg shadow"
+    >
+      Download Document
+    </a>
+  </div>
+)}

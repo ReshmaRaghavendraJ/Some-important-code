@@ -1,0 +1,6 @@
+//Cart.js 
+/* Calculating Subtotal of added item */
+
+const totalAmount = cartItems.reduce((total, item) => {
+  return total + parseFloat(item.rupees); // Use parseFloat for decimal values
+}, 0);

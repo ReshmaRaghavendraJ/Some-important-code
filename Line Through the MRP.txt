@@ -1,0 +1,9 @@
+To add a line-through effect on the original price (M.R.P), you can use the <s> (strikethrough) tag or apply textDecoration: "line-through" in CSS.
+
+
+<Card.Text>
+  <h3 style={{ color: "green" }}> ₹ {item.price}/- Only </h3>
+</Card.Text>
+<Card.Text>
+  <h5 style={{ color: "red" }}> M.R.P: <s>₹ {item.originalPrice}</s> ({item.discount}% off)</h5>
+</Card.Text>

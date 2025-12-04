@@ -1,0 +1,44 @@
+// For retriving only required tables information using DTO:(Mutilpe FK problems)
+//DTO(create package):
+
+package com.example.medicalorder.DTO;
+
+import lombok.Data;
+
+@Data
+public class DistributorDTO
+{
+    private Integer distributorid;
+    private String name;
+    private String address;
+    private String mobile;
+    private String emailid;
+    private String password;
+    private String image;
+    private String city;
+}
+-------------------------------------------------------------------
+//DistributorController
+@GetMapping("/getalldistributors")
+    public ResponseEntity<?> getalldistributors()
+    {
+        List<Distributor> dislist = distributorRepo.findAll();
+        if (dislist.isEmpty())
+        {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        List<DistributorDTO> dis = dislist.stream().map(item ->
+        {
+            DistributorDTO dto = new DistributorDTO();
+            dto.setDistributorid(item.getDistributorid());
+            dto.setName(item.getName());
+            dto.setMobile(item.getMobile());
+            dto.setEmailid(item.getEmailid());
+            dto.setImage(item.getImage());
+            dto.setPassword(item.getPassword());
+            dto.setAddress(item.getAddress());
+            dto.setCity(item.getCity2().getCity());
+            return dto;
+        }).collect(Collectors.toList());
+        return new ResponseEntity<>(dis,HttpStatus.OK);
+    }

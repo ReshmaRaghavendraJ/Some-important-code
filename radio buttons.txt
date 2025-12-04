@@ -1,0 +1,3 @@
+    <label className='form-label'>Gender:</label><br></br>
+    <Form.Check type="radio" label="Male" name="gender" value="Male" onChange={(e) => setGender(e.target.value)}/>
+    <Form.Check type="radio" label="Female" name="gender" value="Female" onChange={(e) => setGender(e.target.value)}/>

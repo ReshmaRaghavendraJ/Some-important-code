@@ -1,0 +1,395 @@
+import React from 'react'
+import { Link } from 'react-router-dom'
+import Nav from 'react-bootstrap/Nav';
+import { useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import "react-datepicker/dist/react-datepicker.css";
+import { format,parseISO  } from 'date-fns';   //To display 'datetime-local' in required format
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
+
+export default function AddCommodity() 
+{
+    const location = useLocation(); // Get current location
+    const [activeKey, setActiveKey] = useState(location.pathname);
+    const[selectedcity,setSelectedcity]=useState('');
+    const[commodity,setCommodity]=useState('');
+    const[price,setPrice]=useState('');
+    const[commoditylist,setCommoditylist]=useState([]);   //display list of commodity details
+    const[citylist,setCitylist]=useState([]);    //Dropdown list of cities
+    const[hidecommodity,setHidecommodity]=useState(false); //Hide commodity list
+    const[commoditydate,setCommoditydate]=useState('');
+    const[commid,setCommid]=useState('');   //For updating new value for commid 
+    const [isEditing, setIsEditing] = useState(false); // New state for edit mode
+  
+    useEffect(() => {
+      setActiveKey(location.pathname); // Update active key when location changes
+  }, [location]);
+
+useEffect(()=>{
+    getallcity();
+},[])
+
+  function addcommodity()   //Add Commodity details based on city
+  {
+    const obj = { selectedcity, commodity, price, commoditydate };
+    axios
+    .post(`http://localhost:8080/addcommodity/${selectedcity}`,obj)
+    .then((res)=>{
+        toast.success(res.data);
+        setHidecommodity(false);
+        clearAll();
+    })
+    .catch((err)=>{
+        toast.error(err.response.data);
+    });
+  }
+
+
+  function getallcommodity()   /* Display list of Commodity details */
+  {
+    axios
+    .get("http://localhost:8080/getallcommodity")
+    .then((res)=>{
+        setCommoditylist(res.data);
+        setHidecommodity(true);
+    })
+    .catch((err)=>{
+        toast.error(err.response.data);
+    });
+  }
+
+
+  function getallcity()   /* Dropdown list of all Cities */
+  {
+    axios
+    .get("http://localhost:8080/getallcity")
+    .then((res)=>{
+        setCitylist(res.data);
+    })
+    .catch((err)=>{
+        toast.error(err.response.data);
+    });
+  }
+
+
+  function clearAll()
+  {
+    setSelectedcity("");
+    setCommodity("");
+    setPrice("");
+    setCommoditydate("");
+    setIsEditing(false); // Reset edit mode
+  }
+
+  const handleCommodityDateChange = (date) => {
+    const formattedDate = format(new Date(date), "yyyy-MM-dd'T'HH:mm:ss");
+    setCommoditydate(formattedDate);
+};
+
+function updatecommodity()   /* Update Commodity details */
+{
+    const obj={commodity,commoditydate,price};
+  axios
+    .put(`http://localhost:8080/updatecommodity/${commid}`,obj)
+    .then((res)=>{
+        toast.success(res.data);
+        getallcommodity();
+        clearAll();
+    })
+    .catch((err)=>{
+        toast.error(err.response.data);
+    });
+}
+
+
+
+const Assignvalues=(id)=>{
+            setCommodity(id.commodity);
+            setPrice(id.price);
+            setCommoditydate(id.commoditydate);
+            setCommid(id.commodityid);
+            setIsEditing(true); // set edit mode
+    };
+
+
+  return (
+    <>
+    <div>
+           <Nav
+               variant="tabs"
+               activeKey={activeKey}
+               onSelect={setActiveKey}
+               style={{
+                   height: "100px",
+                   textAlign: "center",
+                   background: "maroon",
+               }}
+           >
+                <Nav.Item>
+                   <Nav.Link
+                     as={Link} // Use Link for navigation
+                     to="/AddState" // Define the route
+                       eventKey="/AddState"
+                       style={{
+                         color: activeKey === "/AddState" ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "18px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                           marginLeft: "5px"
+                       }}
+                   >
+                       AddState
+                   </Nav.Link>
+               </Nav.Item>
+   
+               <Nav.Item>
+                   <Nav.Link
+                     as={Link} // Use Link for navigation
+                     to="/AddCity" // Define the route
+                       eventKey="/AddCity"
+                       style={{
+                         color: activeKey === "/AddCity" ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "18px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                           marginLeft: "0px"
+                       }}
+                   >
+                       AddCity
+                   </Nav.Link>
+               </Nav.Item>
+   
+               <Nav.Item>
+                   <Nav.Link
+                     as={Link} // Use Link for navigation
+                     to="/AddCommodity" // Define the route
+                       eventKey="/AddCommodity"
+                       style={{
+                         color: activeKey === "/AddCommodity" ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "18px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                           marginLeft: "0px"
+                       }}
+                   >
+                       AddCommodity
+                   </Nav.Link>
+               </Nav.Item>
+   
+   
+               <Nav.Item>
+                   <Nav.Link
+                     as={Link} // Use Link for navigation
+                     to="/Viewcomplaints" // Define the route
+                       eventKey="/Viewcomplaints"
+                       style={{
+                         color: activeKey === "/Viewcomplaints" ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "18px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                         marginLeft: "0px"
+                       }}
+                   >
+                       Viewcomplaints
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                   as={Link} // Use Link for navigation
+                   to="/Addcategory" // Define the route
+                       eventKey="/Addcategory"
+                       style={{
+                         color: activeKey === '/Addcategory' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "18px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                          marginLeft: "0px"
+                       }}
+                   >
+                       Addcategory
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                   as={Link} // Use Link for navigation
+                   to="/Addcropinfo" // Define the route
+                       eventKey="/Addcropinfo"
+                       style={{
+                         color: activeKey === '/Addcropinfo' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "18px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                          marginLeft: "0px"
+                       }}
+                   >
+                       Addcropinfo
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                   as={Link} // Use Link for navigation
+                   to="/Addnews" // Define the route
+                       eventKey="/Addnews"
+                       style={{
+                         color: activeKey === '/Addnews' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "18px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                        marginLeft: "0px"
+                       }}
+                   >
+                       Addnews
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                    as={Link} // Use Link for navigation
+                    to="/Addagrioffice" // Define the route
+                       eventKey="/Addagrioffice"
+                       style={{
+                           color: activeKey === '/Addagrioffice' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "18px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                       marginLeft: "0px",
+                           width: "120px"
+                       }}
+                   >
+                       AddOffice
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                    as={Link} // Use Link for navigation
+                    to="/Viewfeedback" // Define the route
+                       eventKey="/Viewfeedback"
+                       style={{
+                           color: activeKey === '/Viewfeedback' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "18px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                         marginLeft: "0px",
+                           width: "150px"
+                       }}
+                   >
+                       Viewfeedback
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                    as={Link} // Use Link for navigation
+                    to="/Viewuserdetails" // Define the route
+                       eventKey="/Viewuserdetails"
+                       style={{
+                           color: activeKey === '/Viewuserdetails' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "18px",
+                           fontStyle: "oblique",
+                           marginTop: "-45px",
+                           marginLeft: "1200px",
+                           width: "130px"
+                       }}
+                   >
+                       Viewfarmers
+                   </Nav.Link>
+               </Nav.Item>
+   
+               <h1 style={{color:"white",marginLeft:"300px",marginTop:"-90px"}}>Admin Dashboard</h1>
+           </Nav>
+           </div>  
+          
+           
+           
+           <h1 style={{color:"Red",marginLeft:"150px"}}>Add Commodity Details</h1> 
+        <div className='commodityinfo'>
+           <label className='form-label'><h5>Select State:</h5></label>
+            <select className='form-select' value={selectedcity} onChange={(e)=>setSelectedcity(e.target.value)}>
+                <option value={0}>--Choose Options--</option>
+                {
+                    citylist.map((item,index)=>(
+                        <option key={index} value={item.cityid}>{item.cityid}-{item.city}</option>
+                    ))
+                }
+            </select><br></br>
+            <label className='form-label'>Select Commodity Date:</label>
+            <input className='form-control'  type="datetime-local"  value={commoditydate}   onChange={(e) => handleCommodityDateChange(e.target.value)}/>
+        <Form>
+      <Form.Group className="mb-3">
+        <Form.Label><h5>Commodity:</h5></Form.Label>
+        <Form.Control type="text" value={commodity} onChange={(e)=>setCommodity(e.target.value)}/>
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label><h5>Price:</h5></Form.Label>
+        <Form.Control type="text" value={price} onChange={(e)=>setPrice(e.target.value)}/>
+      </Form.Group>
+      </Form> <br></br>
+      <div className='butons'>
+      <Button variant={isEditing ? "warning me-3" : "primary me-3"} size="md" onClick={isEditing ? updatecommodity : addcommodity}>
+                        {isEditing ? "Update" : "Submit"}
+    </Button>
+      <Link to="/" className="btn btn-danger me-3" size="md" >
+       Logout
+      </Link>
+      <Button variant="secondary me-3" size="md" onClick={clearAll}>
+       Cancel
+      </Button>
+      <Button variant="success me-3" size="md" onClick={getallcommodity}>
+       Display
+      </Button>
+      {/* <Button variant="warning me-3" size="md" onClick={updatecommodity}>
+       Update
+      </Button> */}
+      </div>   <br></br><br></br>    
+      </div>
+
+
+     
+    { hidecommodity && (
+      <div className='commoditytable'>
+        <table className='table table-striped'>
+        <thead>
+            <tr>
+                <th>Commodity id</th>
+                <th>Commodity Name</th>
+                <th>Price</th>
+                <th>State Name</th>
+                <th>City Name</th>
+                <th>Commodity Date</th>
+            </tr>
+            </thead>  
+            <tbody>
+             {
+                commoditylist.map((item,index)=>(
+                    <tr key={index}>
+                        <td>{item.commodityid}</td>
+                        <td>{item.commodity}</td>
+                        <td>{item.price}</td>
+                        <td>{item.city2.state1.state}</td>
+                        <td>{item.city2.city}</td>
+                        <td>{format(parseISO(item.commoditydate), "yyyy-MM-dd hh:mm a")}</td>
+                        <td style={{color:"red"}}><FontAwesomeIcon icon={faPen} onClick={()=>Assignvalues(item)}/></td>
+                    </tr>
+                ))
+             }
+                </tbody>          
+        </table>
+        </div>         
+        )}  
+           </>
+  )
+}

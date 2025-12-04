@@ -1,0 +1,100 @@
+DTO
+-----------------
+package com.Advocate_Finder_App_Backend.DTO;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+public class Login {
+
+    private String usertype;
+    private String email;
+    private String password;
+
+}
+
+------------
+
+package com.Advocate_Finder_App_Backend.Controller;
+
+import com.Advocate_Finder_App_Backend.DTO.Login;
+import com.Advocate_Finder_App_Backend.Entity.Admin;
+import com.Advocate_Finder_App_Backend.Repository.AdminRepo;
+import com.Advocate_Finder_App_Backend.Repository.AdvocateRepo;
+import com.Advocate_Finder_App_Backend.Repository.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@CrossOrigin("*")
+public class LoginController {
+
+    @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
+    private AdminRepo adminRepo;
+
+    @Autowired
+    private AdvocateRepo advocateRepo;
+
+
+    @PostMapping("/LoginVerify")
+
+    public ResponseEntity<?> LoginVerify(@RequestBody Login obj)
+    {
+        if(obj.getUsertype().equals("Admin"))
+        {
+            var admin=adminRepo.findByEmail(obj.getEmail()).orElseThrow(()->new RuntimeException("Admin Email Not Found"));
+            if(obj.getPassword().equals(admin.getPassword()))
+            {
+                return new ResponseEntity<>("Admin", HttpStatus.OK);
+            }
+            else
+            {
+                return new ResponseEntity<>("Invalid Password",HttpStatus.OK);
+            }
+
+        }
+
+        else if(obj.getUsertype().equals("User"))
+        {
+            var data=userRepo.findByEmail(obj.getEmail()).orElseThrow(()->new RuntimeException("Company Email Not Found"));
+            if(obj.getPassword().equals(data.getPassword()))
+            {
+                return new ResponseEntity<>("User",HttpStatus.OK);
+            }
+            else
+            {
+                return new ResponseEntity<>("Invalid Password",HttpStatus.OK);
+            }
+        }
+
+        else if(obj.getUsertype().equals("Advocate"))
+        {
+            var data=advocateRepo.findByEmailAndStatus(obj.getEmail(),"Approved").orElseThrow(()->new RuntimeException("Company Email Not Found"));
+            if(obj.getPassword().equals(data.getPassword()))
+            {
+                return new ResponseEntity<>("Advocate",HttpStatus.OK);
+            }
+            else
+            {
+                return new ResponseEntity<>("Invalid Password",HttpStatus.OK);
+            }
+        }
+
+        else
+        {
+            return new ResponseEntity<>("Invalid Usertype", HttpStatus.OK);
+        }
+    }
+
+
+}

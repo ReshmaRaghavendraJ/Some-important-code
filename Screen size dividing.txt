@@ -1,0 +1,6 @@
+//Screen Side is  Dividing into 2 parts:(total 12= 6+6)
+
+<Row>
+  <Col md={6}>Left Side</Col>
+  <Col md={6}>Right Side</Col>
+</Row>

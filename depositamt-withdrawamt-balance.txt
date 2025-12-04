@@ -1,0 +1,49 @@
+//Deposit amount -Withdraw amount =>Balance Amount
+
+
+
+ @PutMapping("/amountwithdraw/{accountdetailsid}")
+    public ResponseEntity<?> amountwithdraw(@PathVariable Integer accountdetailsid, @RequestBody Amountdeposit obj) {
+        // Step 1: Retrieve the account details using the accountdetailsid
+        Accountdetails accountDetails = accountdetailsRepo.findById(accountdetailsid)
+                .orElseThrow(() -> new RuntimeException("Account Details not found with id " + accountdetailsid));
+
+        // Step 2: Retrieve the deposit info associated with the account
+        Optional<Amountdeposit> depositInfo = amountdepositRepo.findByAccountdetails1Accountdetailsid(accountdetailsid);
+
+        // Step 3: Validate if the deposit info exists (check if the Optional is present)
+        if (depositInfo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Deposit information not found for the account.");
+        }
+
+        // Step 4: Get the current deposit amount from the deposit info
+        Amountdeposit deposit = depositInfo.get();
+        int currentDepositAmount = deposit.getDepositamount();
+        int withdrawAmount = obj.getWithdrawamount();
+
+        // Step 5: Check if the withdrawal amount is less than or equal to the current deposit amount
+        if (withdrawAmount > currentDepositAmount) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insufficient funds for withdrawal.");
+        }
+
+        // Step 6: Deduct the withdrawal amount from the deposit amount and update the balance
+        int updatedDepositAmount = currentDepositAmount - withdrawAmount;
+        deposit.setDepositamount(updatedDepositAmount);
+
+        // Step 7: Set the withdrawal amount and time
+        deposit.setWithdrawamount(withdrawAmount);
+        deposit.setWithdrawtime(LocalDateTime.now());
+
+        // Step 8: Update the balance field (optional, depending on your logic)
+        deposit.setBalanceamount(String.valueOf(updatedDepositAmount));
+
+        // Step 9: Save the updated deposit info
+        amountdepositRepo.save(deposit);
+
+        // Step 10: Return a success response with the updated balance
+        return ResponseEntity.ok("Withdrawal successful. New balance: " + updatedDepositAmount);
+    }
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+//Amount deposit Repo
+  Optional<Amountdeposit> findByAccountdetails1Accountdetailsid(Integer accountdetailsid);

@@ -1,0 +1,75 @@
+package com.in.election.controller;
+
+import com.in.election.entity.Electiondate;
+import com.in.election.repository.electiondateRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+@RestController
+@CrossOrigin("*")
+public class ElectiondateController {
+    @Autowired
+    electiondateRepo electiondaterepo;
+
+    @PostMapping("/Addelectiondate")
+    public ResponseEntity<?> Addelectiondate(@RequestBody Electiondate obj) {
+        System.out.println("Strat date is :: " + obj.getStartdatetime());
+        System.out.println("End date is :: " + obj.getEnddatetime());
+        obj.setStatus("Active");
+        electiondaterepo.save(obj);
+        return new ResponseEntity<>("Election date added Successfully", HttpStatus.OK);
+    }
+
+    @GetMapping("/Getall")
+    public ResponseEntity<?> Getall() {
+        List<Electiondate> electionlist = electiondaterepo.findAll();
+        return new ResponseEntity<>(electionlist, HttpStatus.OK);
+    }
+
+    @GetMapping("/checkDateDifference")
+    public ResponseEntity<String> checkDateDifference() {
+        // Get the current date and time
+        LocalDateTime now = LocalDateTime.now();
+
+        // Define the desired date-time format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
+        // Format the current date and time
+        String formattedDateTime = now.format(formatter);
+
+        // Print the formatted date and time
+        System.out.println("Formatted Date and Time: " + formattedDateTime);
+        LocalDateTime currentDate = LocalDateTime.parse(formattedDateTime, formatter);
+
+        // Fetch all election dates from the repository
+        List<Electiondate> getAllElectionDates = electiondaterepo.findAll();
+
+        // Initialize message
+        String message = "Not eligible to vote."; // Default message
+
+        for (Electiondate electiondate : getAllElectionDates) {
+            LocalDateTime startDate = electiondate.getStartdatetime();
+            LocalDateTime endDate = electiondate.getEnddatetime();
+
+            // Print the dates for debugging
+            System.out.println("currentDate :: " + currentDate);
+            System.out.println("startDate :: " + startDate);
+            System.out.println("endDate :: " + endDate);
+
+            // Check if the current date is between the start and end dates
+            if (currentDate.isAfter(startDate) && currentDate.isBefore(endDate)) {
+                message = "You are eligible to vote.";
+                System.out.println(message);
+                break; // Exit loop once eligibility is confirmed
+            }
+        }
+
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+}

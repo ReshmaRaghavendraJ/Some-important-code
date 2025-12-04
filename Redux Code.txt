@@ -1,0 +1,94 @@
+Complete Redux Code:
+---------------------------------------------
+src
+    ->Components
+    ->utils
+            ->Store.js
+            ->cartSlice.js
+-------------------------------------------------------------------
+//Store.js
+import {configureStore} from '@reduxjs/toolkit';
+import cartSlice from './cartSlice';
+
+const store=configureStore({
+    reducer:{
+        cart:cartSlice,
+    },
+});
+
+export default store;
+--------------------------------------------------------------------
+//App.js
+import React from 'react'
+import './App.css';
+import Head from './Components/Head';
+import './Components/styles.css'
+import {Route, BrowserRouter as Router, Routes} from 'react-router-dom'
+import Pongal from './Components/Pongal';
+import {Provider} from 'react-redux';
+import store from './utils/Store';
+
+
+
+export default function App() {
+  return (
+    <Provider store={store}>
+    <Router>
+      <Routes>
+      <Route path="/" element={<Head />} />
+        <Route path="/Pongal" element={<Pongal />} />
+        {/* Add other routes here */}
+      </Routes>
+    </Router>
+    </Provider>
+  )
+}
+------------------------------------------------------------------------------------------------------------
+//cartSlice.js
+import { createSlice } from '@reduxjs/toolkit';
+
+const cartSlice=createSlice({
+    name:'cart',
+    initialState:{
+        items:["Banana","Grapes"],
+    },
+    reducers:{
+        addItem:(state,action)=>{
+            state.items.push(action.payload);
+        },
+        removeItem:(state,action)=>{
+            state.items.pop();
+        },
+        clearCart:(state)=>{
+            state.items=[];
+        }
+    },
+});
+
+export const{addItem,removeItem,clearCart} = cartSlice.actions;
+
+export default cartSlice.reducer;
+---------------------------------------------------------------------------------------------------------------------------
+//Head.js
+import { useSelector } from 'react-redux';
+
+  const cartItems=useSelector(store=>store.cart.items);
+
+    <h5>Cart-{cartItems.length} items</h5>
+
+---------------------------------------------------------------------------------------------------------------------------
+//Pongal.js
+import { addItem } from '../utils/cartSlice'; // Ensure the relative path is correct
+import { useDispatch } from 'react-redux';
+
+ const dispatch=useDispatch();
+
+    const handleAddItems=(products)=>{
+        dispatch(addItem(products));
+        console.log('Added product:', products); // Log the specific product details
+    };
+
+
+<Button variant="contained" color="success"  className="mt-2" onClick={()=>handleAddItems(products)}>
+                 Add +
+             </Button>

@@ -1,0 +1,78 @@
+import React, { useEffect, useState } from 'react'
+import Userdashboard from './Userdashboard'
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import Card from 'react-bootstrap/Card';
+import ListGroup from 'react-bootstrap/ListGroup';
+
+export default function Viewemployees() 
+{
+    const[emplist,setEmplist]=useState([]);
+    const [selectedEmployees, setSelectedEmployees] = useState([]);
+
+
+    const ursid=sessionStorage.getItem('userid');
+
+    useEffect(()=>{
+        getEmployeesByDeliveryAddress(); 
+    });
+    
+    function getEmployeesByDeliveryAddress()    /* Get all employees in card format*/
+    {
+        axios
+      .get(`http://localhost:8080/getEmployeesByDeliveryAddress/${ursid}`)
+      .then((res)=>{
+      setEmplist(res.data);
+      })
+      .catch((err)=>{
+        toast.error(err.response.data);
+      });
+    }
+
+    function updateempstatus(empid)    /* Update Employee Status */
+    {
+        axios
+      .put(`http://localhost:8080/updateempstatus/${empid}`)
+      .then((res)=>{
+      toast.success(res.data);
+      setSelectedEmployees([...selectedEmployees, empid]);
+      })
+      .catch((err)=>{
+        toast.error(err.response.data);
+      });
+    }
+
+  return (
+    <>
+    <Userdashboard/>
+    <h1 style={{color:"purple",padding:"20px",marginLeft:"500px"}}>View Employees</h1>
+    <div className="card-container">
+         {
+            emplist.map((item,index)=>{
+                return(
+                    <Card style={{ width:"300px",height:"500px",marginLeft:"50px" }} key={index}>
+      <Card.Img variant="top" src={item.photo}/>
+      <Card.Body>
+        <Card.Title>{item.empname}
+        </Card.Title>
+      </Card.Body>
+      <ListGroup className="list-group-flush">
+        <ListGroup.Item>{item.qualification}</ListGroup.Item>
+        <ListGroup.Item>{item.address}</ListGroup.Item>
+        <ListGroup.Item>{item.phoneno}</ListGroup.Item>
+        <ListGroup.Item>{item.area1.area}</ListGroup.Item>
+        </ListGroup><br></br>
+        {!selectedEmployees.includes(item.empid) && (
+        <button className='btn btn-primary' style={{ width:"100px",marginLeft:"100px"}} onClick={()=>updateempstatus(item.empid)}>Select</button>
+        )}
+      <Card.Body>
+      </Card.Body>
+    </Card>   
+                )
+            })
+         }
+      
+    </div>
+   </>
+  )
+}

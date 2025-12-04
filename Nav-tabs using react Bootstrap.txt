@@ -1,0 +1,24 @@
+import React from 'react'
+import Nav from 'react-bootstrap/Nav';
+// import './styles.css';
+
+export default function Home() 
+{
+
+    return (
+    <Nav variant="tabs" defaultActiveKey="/" style={{height:"100px",textAlign:"center",background:"darkBlue",fontSize:"larger"}}>
+    <Nav.Item>
+      <Nav.Link href="/" className='btn-danger'>Home</Nav.Link>
+    </Nav.Item>
+    <Nav.Item>
+      <Nav.Link eventKey="/Login" className='btn-danger'>Login</Nav.Link>
+    </Nav.Item>
+    <Nav.Item>
+      <Nav.Link eventKey="/About" className='btn-danger'>About</Nav.Link>
+    </Nav.Item>
+    <Nav.Item>
+      <Nav.Link eventKey="/Register" className='btn-danger'>Register</Nav.Link>
+    </Nav.Item>
+  </Nav>
+  )
+}

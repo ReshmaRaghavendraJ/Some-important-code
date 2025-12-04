@@ -1,0 +1,31 @@
+1)When we have to use Custom Query?
+Ans:If Loan is linked to Bank and Bank is associated with BankPerson, you may need a custom query.
+
+Bank--->Bankperson
+(Bank is link to Bankperson)
+
+Bank--->Loan
+(Bank is link to Loan)
+
+Loan--->Appliedloan
+(Loan is link to Appliedloan)
+
+//Custom Query
+    @Query("SELECT a FROM Appliedloan a WHERE a.loan3.bank2.bankid IN (SELECT b.bank1.bankid FROM Bankperson b WHERE b.bankpersonid = :bankpersonid)")
+    List<Appliedloan> findByBankPersonId(@Param("bankpersonid") Integer bankpersonid);
+
+
+//Display appliedloans
+ @GetMapping("/displayloansappled/{bankpersonid}")
+    public ResponseEntity<?> displayLoansApplied(@PathVariable Integer bankpersonid) {
+        List<Appliedloan> appliedLoans = appliedloanRepo.findByBankPersonId(bankpersonid);
+        if (appliedLoans.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No loans found for the given bank person ID.");
+        }
+        return ResponseEntity.ok(appliedLoans);
+    }
+
+
+
+
+

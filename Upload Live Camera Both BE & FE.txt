@@ -1,0 +1,152 @@
+//Upload Live Camera
+//Backend
+/* Upload Renewals */
+    @PostMapping("/uploadrenewals/{userid}/{appliedpensionid}")
+    public ResponseEntity<?> uploadrenewals(
+            @PathVariable Integer userid,
+            @PathVariable Integer appliedpensionid,
+            @RequestBody Renewal obj) {
+
+        var userinfo = userRepo.findById(userid)
+                .orElseThrow(() -> new RuntimeException("Userid not found"));
+
+        var appliedpensioninfo = appliedpensionRepo.findById(appliedpensionid)
+                .orElseThrow(() -> new RuntimeException("Appliedpensionid not found"));
+
+        Renewal renewal = new Renewal();
+
+        renewal.setUser3(userinfo);                     // set user
+        renewal.setAppliedpension4(appliedpensioninfo); // set applied pension
+
+        renewal.setRenewaldate(LocalDateTime.now());    // auto-set date
+        renewal.setRenewalstatus("Pending");            // or obj.getRenewalstatus()
+        renewal.setPic(obj.getPic());                  // base64 image string
+
+        renewalRepo.save(renewal);
+
+        return ResponseEntity.ok("Renewal Uploaded Successfully!");
+    }
+----------------------------------------------------------------------------------------------------------
+//Frontend
+import { useState, useRef } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+
+export default function Uploadrenewals() {
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  const [photo, setPhoto] = useState(null);
+  const [appliedpensionid, setAppliedpensionid] = useState("");
+
+  const usrid = sessionStorage.getItem("usrid");
+
+  // Start Camera
+  const startCamera = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        videoRef.current.srcObject = stream;
+      })
+      .catch((err) => console.error("Camera Error:", err));
+  };
+
+  // Capture Photo
+  const capturePhoto = () => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    const imageData = canvas.toDataURL("image/jpeg");
+    setPhoto(imageData);
+  };
+
+  // Upload to backend
+  const uploadrenewals = () => {
+    if (!photo) {
+      toast.error("Capture a photo first!");
+      return;
+    }
+
+    if (!appliedpensionid) {
+      toast.error("Enter Applied Pension ID!");
+      return;
+    }
+
+    axios
+      .post(
+        `http://localhost:8080/uploadrenewals/${usrid}/${appliedpensionid}`,
+        { pic: photo }
+      )
+      .then(() => {
+        toast.success("Renewal Uploaded Successfully!");
+        setPhoto(null);
+      })
+      .catch((err) => {
+        toast.error(err.response?.data || "Upload Failed");
+      });
+  };
+
+  return (
+    <div className="p-6 text-center">
+      <h2 className="text-3xl font-bold mb-6">Upload Live Photo for Renewal</h2>
+
+      {/* Applied Pension ID Input */}
+      <input
+        type="number"
+        placeholder="Enter Applied Pension ID"
+        value={appliedpensionid}
+        onChange={(e) => setAppliedpensionid(e.target.value)}
+        className="border p-2 rounded mb-4 w-72"
+      />
+
+      {/* Camera Preview */}
+      <video
+        ref={videoRef}
+        autoPlay
+        className="w-80 mx-auto border rounded-xl"
+      ></video>
+
+      <br />
+
+      <button
+        onClick={startCamera}
+        className="mt-4 bg-blue-600 text-white px-5 py-2 rounded-lg shadow"
+      >
+        Start Camera
+      </button>
+
+      <button
+        onClick={capturePhoto}
+        className="mt-4 ml-3 bg-green-600 text-white px-5 py-2 rounded-lg shadow"
+      >
+        Capture Photo
+      </button>
+
+      <canvas ref={canvasRef} className="hidden"></canvas>
+
+      {/* Captured Photo Preview */}
+      {photo && (
+        <div className="mt-6">
+          <img
+            src={photo}
+            alt="Captured"
+            className="w-80 mx-auto border-4 border-indigo-500 rounded-xl"
+          />
+
+          <button
+            onClick={uploadrenewals}
+            className="mt-5 bg-purple-600 text-white px-6 py-2 rounded-lg shadow-lg"
+          >
+            Upload
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
