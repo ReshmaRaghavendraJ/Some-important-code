@@ -1,0 +1,52 @@
+package Infocenter.Infocenter.Controller;
+
+import Infocenter.Infocenter.Entity.Query;
+import Infocenter.Infocenter.Repository.QueryRepo;
+import Infocenter.Infocenter.Repository.VideoRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@RestController
+@CrossOrigin("*")
+public class QueryController
+{
+    @Autowired
+    QueryRepo queryRepo;
+
+    /* Post Query */
+    @PostMapping("/addquery")
+    public ResponseEntity<?> addquery(@RequestBody Query obj)
+    {
+        obj.setPosteddate(LocalDateTime.now());
+        queryRepo.save(obj);
+        return new ResponseEntity<>("Query Posted Successfully", HttpStatus.OK);
+    }
+
+    /* Get All Query */
+    @GetMapping("/Getallquery")
+    public ResponseEntity<?> Getallquery()
+    {
+        List<Query> querylist=queryRepo.findAll();
+        return new ResponseEntity<>(querylist,HttpStatus.OK);
+    }
+
+    /* Update Query based on queryid */
+    @PutMapping("/updatequery/{queryid}")
+    public ResponseEntity<?> updatequery(@PathVariable Integer queryid,@RequestBody Query obj)
+    {
+        var queryinfo=queryRepo.findById(queryid).orElseThrow(()->new RuntimeException("Queryid not Found"));
+        if (queryinfo.getReply() != null && !queryinfo.getReply().isEmpty())
+        {
+            return new ResponseEntity<>("Query has already been replied to", HttpStatus.BAD_REQUEST);
+        }
+        queryinfo.setReply(obj.getReply());
+        queryinfo.setReplydate(LocalDateTime.now());
+        queryRepo.save(queryinfo);
+        return new ResponseEntity<>("Query Replied Successfully",HttpStatus.OK);
+    }
+}

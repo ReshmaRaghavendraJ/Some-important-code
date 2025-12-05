@@ -1,0 +1,11 @@
+//City already added or not :
+
+ @PostMapping("/addcity")
+    public ResponseEntity<?> addcity(@RequestBody City obj) {
+        if (cityRepo.existsByCity(obj.getCity())) {
+            return new ResponseEntity<>("City Already Exists", HttpStatus.CONFLICT);
+        } else {
+            cityRepo.save(obj);
+            return new ResponseEntity<>("City Added Successfully", HttpStatus.OK);
+        }
+---------------------------------------------------------

@@ -1,0 +1,78 @@
+package com.in.election.entity;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import java.time.LocalDateTime;
+import java.util.Date;
+
+@Entity
+@Getter
+@Setter
+
+public class Electiondate
+{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer electionid;
+    private String electionname;
+    @JsonFormat(pattern = "dd-MM-yyyy hh:mm a", timezone = "Asia/Kolkata")
+    private LocalDateTime startdatetime;
+    @JsonFormat(pattern="dd-MM-yyyy hh:mm a", timezone = "Asia/Kolkata")
+    private LocalDateTime enddatetime;
+    private String status;
+
+    public Electiondate()
+    {
+
+    }
+
+    public Electiondate(Integer electionid, String electionname, LocalDateTime startdatetime, LocalDateTime enddatetime, String status) {
+        this.electionid = electionid;
+        this.electionname = electionname;
+        this.startdatetime = startdatetime;
+        this.enddatetime = enddatetime;
+        this.status = status;
+    }
+
+    public Integer getElectionid() {
+        return electionid;
+    }
+
+    public void setElectionid(Integer electionid) {
+        this.electionid = electionid;
+    }
+
+    public String getElectionname() {
+        return electionname;
+    }
+
+    public void setElectionname(String electionname) {
+        this.electionname = electionname;
+    }
+
+    public LocalDateTime getStartdatetime() {
+        return startdatetime;
+    }
+
+    public void setStartdatetime(LocalDateTime startdatetime) {
+        this.startdatetime = startdatetime;
+    }
+
+    public LocalDateTime getEnddatetime() {
+        return enddatetime;
+    }
+
+    public void setEnddatetime(LocalDateTime enddatetime) {
+        this.enddatetime = enddatetime;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+}

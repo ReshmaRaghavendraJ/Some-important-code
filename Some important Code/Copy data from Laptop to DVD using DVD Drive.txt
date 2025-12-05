@@ -1,0 +1,42 @@
+how to copy data from laptop to dvd using drive?
+
+
+ChatGPT said:
+To copy data from your laptop to a DVD using your DVD drive, follow these steps based on your operating system:
+
+✅ Requirements
+A laptop with a DVD writer.
+
+A blank writable DVD (DVD-R or DVD+R for one-time write, or DVD-RW/DVD+RW for rewritable).
+
+Files or folders to burn.
+
+(Optional) A burning software if you're not using built-in tools.
+
+💻 For Windows 10/11
+🔹 Step 1: Insert the Blank DVD
+Insert a blank DVD into your laptop’s DVD drive.
+
+Windows will detect it and show a prompt:
+👉 “What do you want to do with this disc?”
+
+🔹 Step 2: Choose Burn Option
+Choose "Burn files to disc".
+
+Give your disc a name.
+
+Choose between:
+
+Like a USB flash drive (lets you drag/drop, rewritable style).
+
+With a CD/DVD player (finalizes and makes compatible with other DVD players).
+
+🔹 Step 3: Add Files
+Drag and drop the files/folders into the DVD window.
+
+🔹 Step 4: Burn the Disc
+Click on the "Drive Tools" tab (top menu).
+
+Click "Finish burning" or "Burn to disc".
+
+Follow the wizard and wait for the process to complete.

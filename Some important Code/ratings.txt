@@ -1,0 +1,19 @@
+  const [ratings, setRating] = useState(0);
+
+ const handleStarClick = (selectedRating) => {
+    setRating(selectedRating); // Update the rating state with the selected rating
+  };  
+
+<div className="form-outline lbl">
+                          <label className="form-label me-4 ">Rating</label>
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <span className='mt-5'
+                              key={star}
+                              style={{ cursor: 'pointer', color: star <= ratings ? 'gold' : 'gray', fontSize: '50px' }}
+                              onClick={() => handleStarClick(star)}
+                              required
+                            >
+                              &#9733;
+                            </span>
+                          ))}
+                        </div>

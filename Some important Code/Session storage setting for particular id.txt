@@ -1,0 +1,16 @@
+//Session Storage setting for a particular user's accountdetailsid
+
+ function getacctdetails()  /* get particular user account details */
+  {
+    axios
+    .get(`http://localhost:8080/getacctdetails/${usrid}`)
+    .then((res)=>{
+      const accountDetails = res.data;
+        sessionStorage.setItem('actdetlsid', accountDetails[0].accountdetailsid);
+        //console.log(accountDetails);
+        toast.success('Account details fetched successfully');
+    })
+    .catch((err)=>{
+      toast.error(err.response.data);
+    });
+  }

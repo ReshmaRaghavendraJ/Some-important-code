@@ -1,0 +1,115 @@
+import React, { useEffect, useState } from 'react'
+import Employeesdashboard from './Employeesdashboard'
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import Card from 'react-bootstrap/Card';
+import ListGroup from 'react-bootstrap/ListGroup';
+
+export default function Viewservices()
+ {
+   const[servicelist,setServicelist]=useState([]);
+   const employid=sessionStorage.getItem('empid');
+   const [acceptedServices, setAcceptedServices] = useState(new Set()); // Track accepted services
+
+  useEffect(()=>{
+    getallservicelist();
+  },[])
+
+  function getallservicelist()    /* Get all employees in card format*/
+{
+    axios
+  .get("http://localhost:8080/getallservicelist")
+  .then((res)=>{
+    setServicelist(res.data);
+    debugger;
+  })
+  .catch((err)=>{
+    toast.error(err.response.data);
+  });
+}
+
+function updatestatus(serviceid,userid)    /* Update Status - employee,service andset userid */
+{
+    axios
+  .put(`http://localhost:8080/updatestatus/${serviceid}/${employid}/${userid}`)
+  .then((res)=>{
+    toast.success(res.data);
+    setAcceptedServices((prev) => new Set(prev).add(serviceid)); // Update accepted service IDs
+  })
+  .catch((err)=>{
+    toast.error(err.response.data);
+  });
+}
+
+
+function addworkstatus(serviceid,userid)   /* Add workstatus */
+{
+    axios
+      .post(`http://localhost:8080/addworkstatus/${employid}/${serviceid}/${userid}`)
+      .then((res)=>{
+      toast.success(res.data);
+    setAcceptedServices((prev) => new Set(prev).add(serviceid)); // Hide buttons after successful status update
+    setServicelist((prevList) => prevList.filter(service => service.serviceid !== serviceid));
+  })
+      .catch((err)=>{
+        toast.error(err.response.data);
+      });
+}
+
+
+
+  return (
+    <>
+    <Employeesdashboard/> 
+    <div  style={{color:"purple",padding:"20px",marginLeft:"300px",marginTop:"-1500px"}}>
+    <h1>List of Services:</h1>
+    </div><br></br>
+      <div className="card-container">
+      {
+      servicelist
+      .filter(
+        (item)=>
+                  item.status=="Pending" &&
+                  item.user1 !== null && 
+                  item.area3 !== null &&
+                item.area3.areaid==sessionStorage.getItem('areaidno')  
+          )
+      .map((item,index)=>(
+              <div className="col-md-4" key={index}>
+      <Card style={{ width:"300px",height:"500px",margin:"10px"}} key={index}>
+          {item.photos && <Card.Img variant="top" src={item.photos} style={{height:"150px"}}/>}
+     
+      <Card.Body>
+        <Card.Title>{item.servicename}</Card.Title>
+      </Card.Body>
+      <ListGroup className="list-group-flush">
+        <ListGroup.Item><h6>Service Charge:</h6><img src="https://i.pinimg.com/736x/38/cd/39/38cd3989b25d6f19de68028266273ac4.jpg" width="50px"/>{item.serviceamount}</ListGroup.Item>
+        <ListGroup.Item><h6>Delivery Address:</h6>{item.deliveryaddress}</ListGroup.Item>
+        <ListGroup.Item><h6>Username:</h6>{item.user1.username}</ListGroup.Item>
+        <ListGroup.Item><h6>Contact:</h6>{item.user1.phoneno}</ListGroup.Item>
+        <ListGroup.Item><h6>Pickup Address:</h6>{item.user1.address}</ListGroup.Item>
+        <ListGroup.Item><h6>City:</h6>{item.area3.city.city}</ListGroup.Item>
+        </ListGroup>
+        {acceptedServices.has(item.serviceid) ? (
+          <button
+          className="btn btn-success"
+          style={{ width: '200px', margin: "10px auto" }}
+          onClick={()=>addworkstatus(item.serviceid,item.user1.userid)}
+        >
+          Task Completed
+        </button>
+         ) : (
+          <button
+          className="btn btn-primary"
+          style={{ width: '200px', margin:"10px auto" }} onClick={()=>updatestatus(item.serviceid,item.user1.userid)}
+        >
+         Accept
+        </button>
+         )}
+        </Card>
+        </div>
+            ))}
+        </div>  
+    </>
+  )
+}

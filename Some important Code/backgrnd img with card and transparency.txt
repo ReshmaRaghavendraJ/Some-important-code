@@ -1,0 +1,83 @@
+import React from 'react'
+import Nav from 'react-bootstrap/Nav';
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import Card from 'react-bootstrap/Card';
+import Form from 'react-bootstrap/Form';
+import { useState } from 'react';
+import imges from './back.jfif';
+
+export default function Log() 
+{
+    const location=useLocation();
+    const[userid,setUserid]=useState('');
+    const[password,setPassword]=useState('');
+    const users=["Admin","Incharge","Student"];
+    const[usertype,setUsertype]=useState('');
+
+  return (
+    <>
+    <Nav className="navtabs" variant="tabs">
+        <Nav.Item>
+        <Nav.Link as={Link} to="/"  active={location.pathname === "/"}>Home</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link    as={Link} to="/About"  active={location.pathname === "/About"}>About</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link  as={Link} to="/Login"  active={location.pathname === "/Login"}>Login</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link  as={Link} to="/Register"  active={location.pathname === "/Register"}>Register</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link  as={Link} to="/Contact"  active={location.pathname === "/Contact"}>Contact</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link  as={Link} to="/Log"  active={location.pathname === "/Log"}>Login1</Nav.Link>
+      </Nav.Item>
+    </Nav>
+
+    <img src="https://png.pngtree.com/png-vector/20230612/ourmid/pngtree-scholarship-sign-or-stamp-tag-vector-png-image_7126880.png" alt="logo" style={{marginLeft:"1200px",marginTop:"-150px",width:"150px"}}/>
+    <h1 style={{marginTop:"-120px",marginLeft:"600px",color:"white"}}>Scholarship Management</h1>
+<br></br><br></br>
+
+    <img src={imges} alt="img1"/>
+
+    <Card style={{ 
+    width: "500px", 
+    height: "400px", 
+    marginLeft: "350px", 
+    marginTop: "-1630px", 
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Adjust the color and alpha for transparency
+    border: 'none' // Remove the border if you want a cleaner look
+  }}>
+      <Card.Body>
+        <Card.Title><h1 style={{color:'orangered',textAlign:"center"}}>Login</h1></Card.Title>
+        <Form>
+        <label className='form-label'>Select Usertype:</label>
+          <select className='form-select' value={usertype} onChange={(e)=>setUsertype(e.target.value)}><br></br>
+            <option value={0}>--Select Options--</option>
+            {
+              users.map((item,index)=>(
+                <option key={index} value={item}>{item}</option>
+              ))
+            }
+          </select>
+      <Form.Group className="mb-3">
+        <Form.Label>Enter Userid:</Form.Label>
+        <Form.Control type="text" value={userid} onChange={(e)=>setUserid(e.target.value)}/>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Enter Password:</Form.Label>
+        <Form.Control type="password" value={password} onChange={(e)=>setPassword(e.target.value)}/>
+      </Form.Group>
+      </Form>
+        <Card.Link href="#">Card Link</Card.Link>
+        <Card.Link href="#">Another Link</Card.Link>
+      </Card.Body>
+    </Card>
+   </>
+  )
+}

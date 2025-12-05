@@ -1,0 +1,12 @@
+  @PostMapping("/addcolleges")
+    public ResponseEntity<?> addcolleges(@RequestBody College obj)
+    {
+        Optional<College> existingcollege=collegeRepo.findByCollegename(obj.getCollegename());
+       if(existingcollege.isPresent())
+       {
+           return new ResponseEntity<>("College already exists",HttpStatus.ALREADY_REPORTED);
+       }
+       
+        College col=collegeRepo.save(obj);
+        return new ResponseEntity<>(col, HttpStatus.OK);
+    }

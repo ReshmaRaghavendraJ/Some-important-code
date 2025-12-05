@@ -1,0 +1,47 @@
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { Card, Col, Container, Row } from 'react-bootstrap';
+import { toast } from 'react-toastify';
+
+export default function ViewCategory() 
+{
+    const[categorylist,setCategorylist]=useState([]);
+
+    useEffect(()=>{
+        getallcategory();
+    },[])
+
+    function getallcategory()  /* Display All Category Details */
+    {
+        axios
+        .get("http://localhost:8080/getallcategory")
+        .then((res)=>{
+            setCategorylist(res.data);
+        })
+        .catch((err)=>{
+            toast.error(err.response.data);
+        });
+    }
+
+  return (
+  <><br></br>
+  <h1 style={{textAlign:"center",color:"maroon"}}>List of Categories</h1><br></br>
+  <Container>
+  <Row>
+    {
+        categorylist.map((item,index)=>(
+          <Col key={index} md={4} className="mb-4">
+            <Card className='catgorylist' style={{ width: '18rem',height:"300px"}}>
+            <Card.Img variant="top" src={item.photo} width="20px" height="200px"/>
+            <Card.Body>
+              <Card.Text><h5>Category: {item.category}</h5></Card.Text>
+            </Card.Body>
+          </Card>
+          </Col>
+        ))
+    }
+   </Row>
+   </Container>
+  </>
+  )
+}

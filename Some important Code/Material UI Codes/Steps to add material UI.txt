@@ -1,0 +1,22 @@
+Steps to add material ui:
+->npx create-react-app my-app
+->cd my-app
+->npm install @mui/material @emotion/react @emotion/styled
+->npm install @mui/icons-material  (optional)
+->npm install @mui/system  (optional)
+
+
+Ex:import React from 'react';
+import Button from '@mui/material/Button';
+
+function App() {
+  return (
+    <div>
+      <Button variant="contained" color="primary">
+        Hello Material UI
+      </Button>
+    </div>
+  );
+}
+
+export default App;

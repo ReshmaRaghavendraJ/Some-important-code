@@ -1,0 +1,20 @@
+// Posting Workstatus and at a time updateing employee Status(2 tables using)
+
+ @PostMapping("addworkstatus/{empid}")
+    public ResponseEntity<?> addworkstatus(@PathVariable Integer empid, @RequestBody Workstatus obj)
+    {
+        var empinfo=employeesRepo.findById(empid).orElseThrow(()->new RuntimeException("Employee id not Found"));
+        obj.setEmployees(empinfo);
+        var emp=empinfo;
+        emp.setStatus("Completed");
+        employeesRepo.save(emp);
+        obj.setPosteddate(LocalDateTime.now());
+        boolean workStatusExists = workstatusRepo.existsByEmployees(empinfo);
+        if( workStatusExists)
+        {
+            return new ResponseEntity<>("Workstatus Already added",HttpStatus.CONFLICT);
+        }
+        workstatusRepo.save(obj);
+
+        return new ResponseEntity<>("Workstatus Added Successfully", HttpStatus.OK);
+    }

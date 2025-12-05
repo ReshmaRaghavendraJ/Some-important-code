@@ -1,0 +1,155 @@
+import React, { useEffect, useState } from 'react'
+import Userdashboard from './Userdashboard'
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import Card from 'react-bootstrap/Card';
+import ListGroup from 'react-bootstrap/ListGroup';
+import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
+
+export default function Viewemployees() 
+{
+    const[emplist,setEmplist]=useState([]);  //list emplist inside card
+    const [selectedEmployees, setSelectedEmployees] = useState([]);   //for select button
+    const [feedbackGiven, setFeedbackGiven] = useState([]);   
+    const[feedback,setFeedback]=useState('');
+    const [show, setShow] = useState(false);
+    const [selectedEmpId, setSelectedEmpId] = useState(null);   
+
+    const handleClose = () => setShow(false);   //Modal display
+    const handleShow = (empid) => {
+      setSelectedEmpId(empid);
+      setShow(true);
+  };
+
+    const ursid=sessionStorage.getItem('userid');  //Session storage of user
+
+
+    useEffect(()=>{
+        getEmployeesByDeliveryAddress(); 
+    },[]);
+    
+
+    function getEmployeesByDeliveryAddress()    /* Get all employees in card format*/
+    {
+        axios
+      .get(`http://localhost:8080/getEmployeesByDeliveryAddress/${ursid}`)
+      .then((res)=>{
+      setEmplist(res.data);
+      })
+      .catch((err)=>{
+        toast.error(err.response.data);
+      });
+    }
+
+    function updateempstatus(empid)    /* Update Employee Status */
+    {
+        axios
+      .put(`http://localhost:8080/updateempstatus/${empid}`)
+      .then((res)=>{
+      toast.success(res.data);
+      setSelectedEmployees([...selectedEmployees, empid]);   
+      })
+      .catch((err)=>{
+        toast.error(err.response.data);
+      });
+    }
+
+    function addfeedback(empid)   /* post feedback */
+    {
+      const obj={feedback};
+        axios
+          .post(`http://localhost:8080/addfeedback/${empid}`,obj)
+          .then((res)=>{
+        toast.success(res.data);
+        setFeedbackGiven([...feedbackGiven, empid]);
+        setFeedback(''); // Reset feedback after submission
+        handleClose(); // Close modal after submitting
+          })
+          .catch((err)=>{
+            toast.error(err.response.data);
+          });
+    }
+
+
+    function isEmployeeSelected(empid) {
+      return selectedEmployees.includes(empid);
+    }
+
+
+  function isFeedbackGiven(empid) {
+    return feedbackGiven.includes(empid);
+  }
+
+  return (
+    <>
+    <Userdashboard/>
+    <h1 style={{color:"purple",padding:"20px",marginLeft:"500px"}}>View Employees</h1>
+    <div className="card-container">
+    {
+            emplist.map((item,index)=>{
+                return(
+                    <Card style={{ width:"300px",height:"500px",marginLeft:"50px" }} key={index}>
+      <Card.Img variant="top" src={item.photo}/>
+      <Card.Body>
+        <Card.Title>{item.empname}
+        </Card.Title>
+      </Card.Body>
+      <ListGroup className="list-group-flush">
+        <ListGroup.Item>{item.qualification}</ListGroup.Item>
+        <ListGroup.Item>{item.address}</ListGroup.Item>
+        <ListGroup.Item>{item.phoneno}</ListGroup.Item>
+        <ListGroup.Item>{item.area1.area}</ListGroup.Item>
+        </ListGroup><br></br>
+        {!isFeedbackGiven(item.empid) ? (
+        !isEmployeeSelected(item.empid) ? (
+        <button className='btn btn-primary' style={{ width:"100px",marginLeft:"80px"}} onClick={()=>updateempstatus(item.empid)}>Select</button>
+      ) : (
+          <button
+                  className="btn btn-success"
+                  style={{ width: '100px', marginLeft: '110px',marginTop:'20px' }} onClick={()=>handleShow(item.empid)}
+                >
+                  Feedback
+                </button>
+      )
+      ):(
+        <p style={{ color: 'green', textAlign: 'center', marginTop: '10px' }}>
+        Feedback Given
+      </p>
+      )}
+      <Card.Body>
+      </Card.Body>
+    </Card>   
+                )
+            })
+        }
+        
+    </div>
+         
+        
+         <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Post Feedback</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+        <Form.Group className="mb-3">
+        <Form.Label>Feedback</Form.Label>
+        <Form.Control type="text" value={feedback} onChange={(e)=>setFeedback(e.target.value)}/>
+      </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={()=>addfeedback(selectedEmpId)}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+    <Link to="/" className="btn btn-danger" style={{marginLeft:"1200px",marginTop:"20px"}}>Logout</Link>
+   </>
+  )
+}

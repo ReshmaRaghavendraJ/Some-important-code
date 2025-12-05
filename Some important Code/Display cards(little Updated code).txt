@@ -1,0 +1,179 @@
+import React from 'react'
+import { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom'
+import Card from 'react-bootstrap/Card';
+
+
+
+export default function Browsefacility() 
+{
+    const[citylist,setCitylist]=useState([]); 
+    const[selectedcity,setSelectedcity]=useState('');
+    const[selectedtype,setSelectedtype]=useState('');
+    const[typelist,setTypelist]=useState([]);   /* Drop down list of Types */
+    const [itemslist, setItemslist] = useState([]);
+    const[videoslist,setVideoslist]=useState([]);   //Displaying videos
+     const[photoslist,setPhotoslist]=useState([]);      //Displaying photos
+     const[selectedfacilityid,setSelectedFacilityid]=useState('');
+
+
+
+
+    useEffect(()=>{
+      getallcities();
+      getalltypes();
+
+    },[])
+
+ 
+
+  
+
+    function getallcities()   /* Drop down list for citylist */
+    {
+      axios
+      .get("http://localhost:8080/getallcities")
+      .then((res)=>{
+        setCitylist(res.data);
+      })
+      .catch((err)=>{
+        toast.error(err.response.data); 
+      });
+    }
+
+    function getalltypes()   /* Drop down list of Types */
+    {
+      axios
+      .get("http://localhost:8080/getalltypes")
+      .then((res)=>{
+        setTypelist(res.data);
+      })
+      .catch((err)=>{
+        toast.error(err.response.data);
+      });
+    }
+
+    function Getallfacilities() {
+      axios
+          .get(`http://localhost:8080/Getallfacilities/${selectedcity}/${selectedtype}`)
+          .then((res) => {
+              setItemslist(Array.isArray(res.data) ? res.data :[]);
+          })
+          .catch((err) => {
+              toast.error(err.response.data);
+          });
+  }
+
+  function getvideo(facilityid) 
+  {
+    if (selectedfacilityid === facilityid) {
+      setSelectedFacilityid(null); // Toggle off if already selected
+      setVideoslist([]);
+  } else {
+    setSelectedFacilityid(facilityid);// Save the selected Facilityid
+    axios
+        .get(`http://localhost:8080/getvideo/${facilityid}`)
+        .then((res) => {
+          setVideoslist(res.data);    //YOUTUBE
+          setPhotoslist([]);
+          debugger
+        })
+        .catch((err) => {
+            toast.error(err.response.data);
+        });
+    }
+  }
+
+    function getphoto(facilityid) 
+    {
+      if (selectedfacilityid === facilityid) {
+        setSelectedFacilityid(null); // Toggle off if already selected
+        setPhotoslist([]);
+    } else {
+      setSelectedFacilityid(facilityid);// Save the selected Facilityid
+      axios
+          .get(`http://localhost:8080/getphoto/${facilityid}`)
+          .then((res) => {
+            setPhotoslist(res.data);   //Photo
+            setVideoslist([]);
+            debugger;
+          })
+          .catch((err) => {
+              toast.error(err.response.data);
+          });
+      }
+    }
+
+      
+  return (
+    <>
+    <div>
+    <h1 style={{color:"purple",textShadow:"2px 2px 4px rgba(0.5, 0.4, 0, 0.6)",marginLeft:"100px"}}>Browse Facilities</h1>
+    <label className='form-label' style={{marginLeft:"100px",fontWeight:"bold",fontFamily:"monospace"}}>Select City:</label>
+    <select className='form-select' style={{width:"400px",marginLeft:"50px"}} value={selectedcity} onChange={(e)=>setSelectedcity(e.target.value)}>
+      <option value={0}>--Select Options--</option>
+      {
+        citylist.map((item,index)=>{
+          return(
+            <option key={index} value={item.cityid}>{item.cityid}-{item.city}</option>
+          )
+        })
+      }
+    </select>
+      
+    <label className='form-label' style={{marginLeft:"100px",fontWeight:"bold",fontFamily:"monospace"}}>Select Type:</label>
+    <select className='form-select' style={{width:"400px",marginLeft:"50px"}} value={selectedtype} onChange={(e)=>setSelectedtype(e.target.value)}>
+      <option value={0}>--Select Options--</option>
+      {
+        typelist.map((item,index)=>{
+          return(
+            <option key={index} value={item.typeid}>{item.typeid}-{item.type}</option>
+          )
+        })
+      }
+    </select><br></br>
+
+<button className="btn btn-primary" onClick={Getallfacilities}style={{marginLeft:"150px"}}> Display Facility:</button><br></br><br></br>
+    <div  style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginLeft: '50px' }}><br></br>
+      {itemslist.map((card, index) => (
+            <Card style={{ width: '400px',height:"800px" ,marginLeft:"50px",backgroundColor:"lightyellow"}} key={index}>
+              <Card.Body>
+              <Card.Text>Logo: <img src={card.logo} width="200px" height="150px"/></Card.Text>
+              <Card.Text><b>Facility Name:</b> {card.facilityname}</Card.Text>
+                <Card.Text><b>Facility id:</b> {card.facilityid}</Card.Text>
+                <button className="btn btn-primary vi" onClick={() => getvideo(card.facilityid)}>Load Videos</button><br></br>
+                <button className="btn btn-primary ph" onClick={() => getphoto(card.facilityid)}>View Photo</button><br></br>
+                {
+                 
+                 selectedfacilityid === card.facilityid && videoslist
+                  .map((v, index) => (
+                  <div key={index}>
+                    <Card.Text><b>Description:</b> {v.description}</Card.Text>
+                    <a className="btn btn-danger" href={v.video} target="_blank" rel="noopener noreferrer">Watch on youtube</a><br></br>
+                    </div>
+                  ))
+               }<br></br>
+
+              {  
+                   selectedfacilityid === card.facilityid && photoslist
+                 .map((p, index) => (
+                 <div key={index}>
+                  <Card.Text><img src={p.photo} width="380px" height="200px" style={{marginLeft:"-5px"}}/></Card.Text>
+                   <Card.Text><b>Description:</b>  {p.description}</Card.Text>
+                   </div>
+                 ))
+              }
+                 </Card.Body>
+                 </Card>
+          ))}
+          <br></br>
+              </div>
+                <Link to="/" className='btn btn-warning me-4' style={{ marginLeft: "1200px" }}>Back</Link>
+           
+</div>    
+    </>
+  )
+}

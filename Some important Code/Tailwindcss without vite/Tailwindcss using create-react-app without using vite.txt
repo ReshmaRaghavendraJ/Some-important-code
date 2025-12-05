@@ -1,0 +1,27 @@
+//Without any Vite using Create-react-app use Tailwindcss
+
+Link--> https://v3.tailwindcss.com/docs/guides/create-react-app
+->npx create-react-app my-project
+->cd my-project
+->npm install -D tailwindcss@3
+->npx tailwindcss init
+->//tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [ "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+----------------------------------------
+->//index.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+-------------------------------------------
+//index.js
+import './index.css'; // 👈 This must be the file with the Tailwind directives
+-----------------------------------------
+->npm run start

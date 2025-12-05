@@ -1,0 +1,22 @@
+
+//Employee Repo:
+
+//Custom Query for retriving Employees details
+        @Query("SELECT e FROM Employees e " +
+                "JOIN e.area1 a " +
+                "JOIN Services s ON s.deliveryaddress = a.area " +
+                "WHERE s.user1.userid = :userid AND e.status='Pending' ")
+        List<Employees> findEmployeesByMatchingAreaName(@Param("userid") Integer userid);
+----------------------------------------------------------------------------------------------------
+ 
+//Employee Controller
+
+@GetMapping("/getEmployeesByDeliveryAddress/{userid}")
+    public ResponseEntity<?> getEmployeesByDeliveryAddress(@PathVariable Integer userid)
+    {
+        var userinfo=userRepo.findById(userid).orElseThrow(()->new RuntimeException("Userid not found"));
+        List<Employees> emplist=employeesRepo.findEmployeesByMatchingAreaName(userid);
+        return new ResponseEntity<>(emplist,HttpStatus.OK);
+    }
+
+-----------------------------------------------------------------------------------------------------------

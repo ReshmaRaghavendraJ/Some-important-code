@@ -1,0 +1,246 @@
+import React from 'react'
+import { Link } from 'react-router-dom'
+import Nav from 'react-bootstrap/Nav';
+import { useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+export default function UpdateProfile() 
+{
+    const location = useLocation(); // Get current location
+    const [activeKey, setActiveKey] = useState(location.pathname);
+    const[farmername,setFarmername]=useState('');
+    const[phoneno,setPhoneno]=useState('');
+    const[email,setEmail]=useState('');
+    const[password,setPassword]=useState('');
+
+    const frmrid=sessionStorage.getItem('farmerid');
+
+    useEffect(()=>{
+        getfarmer();
+    },[])
+  
+    useEffect(() => {
+      setActiveKey(location.pathname); // Update active key when location changes
+  }, [location]);
+
+  function clearAll()
+  {
+    setFarmername("");
+    setEmail("");
+    setPassword("");
+    setPhoneno("");
+  }
+
+  function getfarmer()
+  {
+    axios
+        .get(`http://localhost:8080/getfarmer/${frmrid}`)
+        .then((res)=>{
+            setFarmername(res.data.farmername);
+            setPhoneno(res.data.phoneno);
+            setEmail(res.data.email);
+            setPassword(res.data.password);
+        })
+        .catch((err)=>{
+            toast.error(err.response.data);
+        });
+  }
+
+  function updateprofile()        /* Update Farmer Profile details */
+    {
+        const obj={farmername,phoneno,email,password};
+        axios
+        .put(`http://localhost:8080/updateprofile/${frmrid}`,obj)
+        .then((res)=>{
+            toast.success(res.data);
+            clearAll();
+        })
+        .catch((err)=>{
+            toast.error(err.response.data);
+        });
+    }
+
+
+  return (
+    <>
+    <div>
+           <Nav
+               variant="tabs"
+               activeKey={activeKey}
+               onSelect={setActiveKey}
+               style={{
+                   height: "100px",
+                   textAlign: "center",
+                   background: "maroon",
+                   fontSize: "larger"
+               }}
+           >
+               <Nav.Item>
+                   <Nav.Link
+                     as={Link} // Use Link for navigation
+                     to="/Postcomplaints" // Define the route
+                       eventKey="/Postcomplaints"
+                       style={{
+                         color: activeKey === "/Postcomplaints" ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "20px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                           marginLeft: "10px"
+                       }}
+                   >
+                       Postcomplaints
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                   as={Link} // Use Link for navigation
+                   to="/Viewcomplaintstatus" // Define the route
+                       eventKey="/Viewcomplaintstatus"
+                       style={{
+                         color: activeKey === '/Viewcomplaintstatus' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "20px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                           marginLeft: "10px"
+                       }}
+                   >
+                       Viewcompstatus
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                   as={Link} // Use Link for navigation
+                   to="/Searchbycategory" // Define the route
+                       eventKey="/Searchbycategory"
+                       style={{
+                         color: activeKey === '/Searchbycategory' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "20px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                           marginLeft: "10px"
+                       }}
+                   >
+                       Searchbycategory
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                   as={Link} // Use Link for navigation
+                   to="/Viewnews" // Define the route
+                       eventKey="/Viewnews"
+                       style={{
+                         color: activeKey === '/Viewnews' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "20px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                           marginLeft: "10px"
+                       }}
+                   >
+                       Viewnews
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                    as={Link} // Use Link for navigation
+                    to="/Viewagrioffice" // Define the route
+                       eventKey="/Viewagrioffice"
+                       style={{
+                           color: activeKey === '/Viewagrioffice' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "20px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                           marginLeft: "10px",
+                           width: "100px"
+                       }}
+                   >
+                       ViewOffice
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                    as={Link} // Use Link for navigation
+                    to="/Postfeedback" // Define the route
+                       eventKey="/Postfeedback"
+                       style={{
+                           color: activeKey === '/Postfeedback' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "20px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                           marginLeft: "50px",
+                           width: "100px"
+                       }}
+                   >
+                       Postfeedback
+                   </Nav.Link>
+               </Nav.Item>
+               <Nav.Item>
+                   <Nav.Link
+                    as={Link} // Use Link for navigation
+                    to="/UpdateProfile" // Define the route
+                       eventKey="/UpdateProfile"
+                       style={{
+                           color: activeKey === '/UpdateProfile' ? "maroon" : "pink",
+                           fontWeight: "bold",
+                           fontSize: "20px",
+                           fontStyle: "oblique",
+                           marginTop: "51px",
+                           marginLeft: "80px",
+                           width: "100px"
+                       }}
+                   >
+                       UpdateProfile
+                   </Nav.Link>
+               </Nav.Item>
+   
+               <h1 style={{color:"white",marginLeft:"-500px",marginTop:"5px"}}>Farmer Dashboard</h1>
+           </Nav>
+           </div>  
+           <Link to="/" ><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9FbkEt8EWDLyJwqQ80JvC9klbXTQJ-qGX6QzuBSvcN1kbg7xa8725OkrAaOO734wog-E&usqp=CAU" alt="backimg" width="50px"/></Link>
+
+           <h1 style={{color:"Red",marginLeft:"500px"}}>Update Profile</h1>
+        <div className='registerpage'>
+        <Form>
+      <Form.Group className="mb-3">
+        <Form.Label><h5>Farmer Name:</h5></Form.Label>
+        <Form.Control type="text" value={farmername} onChange={(e)=>setFarmername(e.target.value)}/>
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label><h5>Phoneno:</h5></Form.Label>
+        <Form.Control type="text" value={phoneno} onChange={(e)=>setPhoneno(e.target.value)}/>
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label><h5>Email-id:</h5></Form.Label>
+        <Form.Control type="text" value={email} onChange={(e)=>setEmail(e.target.value)}/>
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label><h5>Password:</h5></Form.Label>
+        <Form.Control type="text" value={password} onChange={(e)=>setPassword(e.target.value)}/>
+      </Form.Group>
+      </Form>
+        </div>
+
+        <div className='butons'>
+      <Button variant="primary me-3" size="md" onClick={updateprofile}>
+       Update
+      </Button>
+      <Link to="/" className="btn btn-danger me-3" size="md" >
+       Logout
+      </Link>
+      <Button variant="secondary me-3" size="md" onClick={clearAll}>
+       Cancel
+      </Button>
+      </div>
+           </>
+  )
+}

@@ -1,0 +1,7 @@
+//Without css..Only using Bootstrap  
+
+ <div className=' container col-sm-12'>
+    <div className='card mt-5 bg-success'>
+      <h4 className='text-center py-2 text-white'>Add State</h4>
+    </div>
+   </div>

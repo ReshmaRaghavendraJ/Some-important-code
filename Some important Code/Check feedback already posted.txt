@@ -1,0 +1,71 @@
+//This API is for checking whether feedback already posted for the same Employee:
+
+@PostMapping("/addfeedback/{empid}")
+    public ResponseEntity<?> addfeedback(@PathVariable Integer empid,@RequestBody Feedback obj)
+    {
+        var empinfo=employeesRepo.findById(empid).orElseThrow(()->new RuntimeException("Employee id not Found"));
+        obj.setEmployees1(empinfo);
+        if(feedbackRepo.existsByEmployees1(obj.getEmployees1()))
+        {
+            return new ResponseEntity<>("Feedback already added for this Employee",HttpStatus.CONFLICT);
+        }
+        feedbackRepo.save(obj);
+        return new ResponseEntity<>("Feedback posted Successfully", HttpStatus.OK);
+    }
+
+
+--------------------------------------------------------------------------------
+package com.example.Elderlycare.Entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Getter
+@Setter
+public class Feedback
+{
+   @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer feedbackid;
+    private String feedback;
+
+    public Feedback()
+    {
+    }
+
+    public Feedback(Integer feedbackid, String feedback, Employees employees1) {
+        this.feedbackid = feedbackid;
+        this.feedback = feedback;
+        this.employees1 = employees1;
+    }
+
+    public Integer getFeedbackid() {
+        return feedbackid;
+    }
+
+    public void setFeedbackid(Integer feedbackid) {
+        this.feedbackid = feedbackid;
+    }
+
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
+
+    public Employees getEmployees1() {
+        return employees1;
+    }
+
+    public void setEmployees1(Employees employees1) {
+        this.employees1 = employees1;
+    }
+
+    @ManyToOne
+    @JoinColumn(name="empid")
+    private Employees employees1;
+}

@@ -1,0 +1,105 @@
+package com.DigitalMenuBackEnd.Controller;
+
+import com.DigitalMenuBackEnd.DTO.Logindto;
+import com.DigitalMenuBackEnd.Repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@CrossOrigin("*")
+public class LoginController {
+
+    @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
+    private AdminRepo adminRepo;
+
+    @Autowired
+    private FormerRepo formerRepo;
+
+    @Autowired
+    private RetailerRepo retailerRepo;
+
+    @Autowired
+    private ChefRepo chefRepo;
+
+    @PostMapping("/LoginVerify")
+    public ResponseEntity<?> LoginVerify(@RequestBody Logindto obj)
+    {
+        if(obj.getUsertype().equals("Admin"))
+        {
+            var admin=adminRepo.findByEmail(obj.getEmail()).orElseThrow(()->new RuntimeException("Admin Email Not Found"));
+            if(obj.getPassword().equals(admin.getPassword()))
+            {
+                return new ResponseEntity<>("Admin", HttpStatus.OK);
+            }
+            else
+            {
+                return new ResponseEntity<>("Invalid Password",HttpStatus.OK);
+            }
+        }
+        else if(obj.getUsertype().equals("User"))
+        {
+            var data=userRepo.findByEmail(obj.getEmail()).orElseThrow(()->new RuntimeException("Company Email Not Found"));
+            if(obj.getPassword().equals(data.getPassword()))
+            {
+                return new ResponseEntity<>("User",HttpStatus.OK);
+            }
+            else
+            {
+                return new ResponseEntity<>("Invalid Password",HttpStatus.OK);
+            }
+        }
+
+        else if(obj.getUsertype().equals("Chef"))
+        {
+            var data=chefRepo.findByEmail(obj.getEmail()).orElseThrow(()->new RuntimeException("Company Email Not Found"));
+            if(obj.getPassword().equals(data.getPassword()))
+            {
+                return new ResponseEntity<>("Chef",HttpStatus.OK);
+            }
+            else
+            {
+                return new ResponseEntity<>("Invalid Password",HttpStatus.OK);
+            }
+        }
+
+        else if(obj.getUsertype().equals("Retailer"))
+        {
+            var data=retailerRepo.findByEmail(obj.getEmail()).orElseThrow(()->new RuntimeException("Company Email Not Found"));
+            if(obj.getPassword().equals(data.getPassword()))
+            {
+                return new ResponseEntity<>("Retailer",HttpStatus.OK);
+            }
+            else
+            {
+                return new ResponseEntity<>("Invalid Password",HttpStatus.OK);
+            }
+        }
+
+        else if(obj.getUsertype().equals("Former"))
+        {
+            var data=formerRepo.findByEmail(obj.getEmail()).orElseThrow(()->new RuntimeException("Company Email Not Found"));
+            if(obj.getPassword().equals(data.getPassword()))
+            {
+                return new ResponseEntity<>("Former",HttpStatus.OK);
+            }
+            else
+            {
+                return new ResponseEntity<>("Invalid Password",HttpStatus.OK);
+            }
+        }
+
+        else
+        {
+            return new ResponseEntity<>("Invalid Usertype", HttpStatus.OK);
+        }
+    }
+
+}

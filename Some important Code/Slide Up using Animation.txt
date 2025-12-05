@@ -1,0 +1,12 @@
+//Slide Up
+.footerbody  .card-body
+{
+  animation-name: slideUp;
+  animation-duration: 4s;
+  animation-timing-function: ease-in-out;
+}
+@keyframes slideUp
+{
+  0%{ transform: translateY(100px); /* Start from below */}
+  100%{  transform: translateY(0); /* End at normal position */}
+}

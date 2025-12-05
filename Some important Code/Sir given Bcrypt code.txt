@@ -1,0 +1,30 @@
+<dependency>
+<groupId>org.springframework.security</groupId>
+<artifactId>spring-security-crypto</artifactId>
+<version>6.1.1</version>
+</dependency>
+----------------------------------------------------------------------------------
+@PutMapping("/CreatePassword/{email}")
+    public ResponseEntity<?> createPassword (@PathVariable String email, @RequestBody User obj)
+    {
+        var user = userRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User not found"));
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
+        user.setUser_password(bCrypt.encode(obj.getUser_password()));
+        user.setUser_otp(0);
+        userRepo.save(user);
+        return new ResponseEntity<>("Password changed successfully", HttpStatus.OK);
+    }
+----------------------------------------------------------------------------------------
+@PostMapping("/UserLogin")
+        public ResponseEntity<?> userLogin (@RequestBody User obj)
+    {
+
+        var user = userRepo.findByEmail(obj.getEmail()).orElseThrow(()-> new RuntimeException("User not found"));
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
+        if(bCrypt.matches(obj.getUser_password(), user.getUser_password())){
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
+        else {
+                throw new RuntimeException("Invalid Password");
+        }
+    }
